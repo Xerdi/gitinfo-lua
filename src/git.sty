@@ -1,0 +1,89 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{git}[2023/10/13 Xerdi's Git Package]
+
+\RequirePackage{luacode}
+
+\directlua{git = require('git-latex')}
+
+\RequirePackage{pgfopts}
+
+\newif\ifgit@usetags
+\newif\ifgit@multipleauthors
+\newif\ifgit@appendemail
+\newif\ifgit@sortalpha
+\newif\ifgit@setmacros
+\pgfkeys{/git/.is family,
+    /git,
+    use tags/.is if=git@usetags,
+    use tags=false,
+    lastcommit/.style={use tags=false},
+    tags/.style={use tags=true},
+    multiple authors/.is if=git@multipleauthors,
+    multiple authors=false,
+    author/.style={multiple authors=false},
+    authors/.style={multiple authors=true},
+    append author emails/.is if=git@appendemail,
+    append author emails=false,
+    sort author by alphabet/.is if=git@sortalpha,
+    sort author by alphabet=false,
+    alpha/.style={sort author by alphabet=true},
+    contrib/.style={sort author by alphabet=false},
+    email/.style={append author emails=true},
+    set title page macros/.is if=git@setmacros,
+    set title page macros=false,
+    titlepage/.style={set title page macros=true}
+}
+
+\ProcessPgfPackageOptions*
+
+\makeatletter
+
+\newcommand*\gitversion{\directlua{git.version()}}
+\newcommand*\gitauthor{\directlua{git.author()}}
+\newcommand*\gitemail{\directlua{git.email()}}
+\newcommand*\gitdate{\directlua{git.commit_date()}}
+\newcommand*\gitdirectory[1]{\directlua{git.directory('#1')}}
+\newcommand*\gitunsetdirectory{\directlua{git.directory(nil)}}
+
+\newcommand\author@conjunction{,~}
+\newcommand\doAuthor[1]{#1}
+\newcommand\doAuthorAndEmail[2]{%
+    #1
+    \ifcsname href\endcsname%
+        \href{mailto:#2}{\textlangle#2\textrangle}%
+    \else%
+        \texttt{\textlangle#2\textrangle}%
+    \fi%
+}
+
+\newcommand*\forgitauthor[1] % conjunction
+[\author@conjunction]
+{%
+\ifgit@appendemail%
+\ifgit@sortalpha%
+\directlua{git.for_author('doAuthorAndEmail', '#1', true, 'alpha')}%
+\else%
+\directlua{git.for_author('doAuthorAndEmail', '#1', true, 'contrib')}%
+\fi%
+\else%
+\ifgit@sortalpha%
+\directlua{git.for_author('doAuthor', '#1', false, 'alpha')}%
+\else%
+\directlua{git.for_author('doAuthor', '#1', false, 'contrib')}%
+\fi%
+\fi%
+}
+
+\newcommand*\forgitcommit[1]{#1}
+
+\ifgit@setmacros
+    \ifgit@multipleauthors
+        \author{\forgitauthor[\\\\]}
+    \else
+        \author{\gitauthor}
+    \fi
+    \directlua{git.set_date()}
+    \date{\today}
+\fi
+
+\endinput
