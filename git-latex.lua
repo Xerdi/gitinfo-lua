@@ -1,3 +1,7 @@
+
+-- TODO: Set git version as (attribute is counter)
+-- TODO: Do the functions using \luaFunction table
+
 if not modules then
     modules = {}
 end
@@ -140,15 +144,72 @@ mk_action('for_author', function(csname, conj, append_email, sort)
     end
 end, false)
 
-mk_action('for_commit', function(csname, revspec)
+local commit_format = '{%h}{%an}{%ae}{%as}{%s}{%b}'
+
+local function commit(csname, rev)
+    local cmd = 'git log --pretty=format:"\\' .. csname .. commit_format .. '" ' .. rev
+    return cmdline(cmd)
+end
+
+module.actions.commit = commit
+
+local function for_commit(csname, revspec)
     local name = 'commit_' .. csname
-    local cmd = 'git log --no-merges --pretty=format:"\\' .. csname .. '{%h}{%an}{%ae}{%as}{%s}{%b}"'
-    if revspec then
+    local cmd = 'git log --no-merges --pretty=format:"\\' .. csname .. commit_format .. '"'
+    if revspec and revspec:match('.+%.%.%..+') then
         cmd = cmd .. ' ' .. revspec
+        name = name .. '_' .. revspec
     end
     register_cached_command(name, cmd)
-    tex.print(cmds[name]() or '')
+    return cmds[name]() or ''
+end
 
+module.actions.for_commit = for_commit
+--mk_action('for_commit', for_commit, true)
+
+local tag_format = '{%(refname:short)}%(if)%(taggername)%(then){%(taggername)}{%(taggeremail)}{%(taggerdate:short)}%(else){%(authorname)}{%(authoremail)}{%(authordate:short)}%(end){%(subject)}{%(body)}'
+
+local function for_tag(csname)
+    local name = 'tag_' .. csname
+    local cmd = 'git for-each-ref --format="\\' .. csname .. tag_format .. '" --sort=-authordate refs/tags'
+    register_cached_command(name, cmd)
+    return cmds[name]() or ''
+end
+
+module.actions.for_tag = for_tag
+--mk_action('for_tag', for_tag, true)
+
+mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commits)
+    local sequence = {}
+    local tags_result = for_tag(csname_tag)
+    local first_commit = cmds.first_commit()
+    local tag_list = cmds.tag_list() .. first_commit
+    for version_tag in tag_list:gmatch("(.-)\n") do
+        table.insert(sequence, version_tag)
+    end
+    local cur_rev = sequence[1]
+    for i = 2, #sequence do
+        local match = string.match(tags_result, '\\[^{}]-{' .. cur_rev .. '}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}')
+        if match then
+            tex.print(match)
+        end
+        -- Appending commits
+        local revspec = cur_rev .. '...' .. sequence[i]
+        local commits = for_commit(csname_commit, revspec)
+        for commit_line in commits:gmatch('\\[^{}]-{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}') do
+            tex.print(commit_line)
+        end
+        -- Add the very last commit
+        if i == #sequence then
+            local last = commit(csname_commit, first_commit)
+            tex.print(last)
+        end
+        -- After every batch of commits
+        if after_commits then
+            tex.print(after_commits)
+        end
+        cur_rev = sequence[i]
+    end
 end, false)
 
 mk_action('directory', function(dir)
