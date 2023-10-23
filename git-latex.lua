@@ -20,7 +20,18 @@ modules[module.name] = module.info
 
 local api = {
     cur_tok = nil,
-    cmd = require('git-cmd')
+    cmd = require('git-cmd'),
+    escape_chars = {
+        ['&'] = '\\&',
+        ['%%'] = '\\%',
+        ['%$'] = '\\$',
+        ['#'] = '\\#',
+        ['_'] = '\\_',
+        ['{'] = '\\{',
+        ['}'] = '\\}',
+        ['~'] = '\\textasciitilde',
+        ['%^'] = '\\textasciicircum'
+    }
 }
 local mt = {
     __index = api,
@@ -135,14 +146,22 @@ mk_action('for_author', function(csname, conj, append_email, sort)
     end
 end, false)
 
+
+function api:escape_str(value)
+    local buf = string.gsub(value, '\\', '\\textbackslash')
+    for search, replace in pairs(self.escape_chars) do
+        buf = string.gsub(buf, search, replace)
+    end
+    return buf
+end
+
 local commit_format = '{%h}{%an}{%ae}{%as}{%s}{%b}'
 
-local function commit(csname, rev)
+-- todo make method
+function api.commit(csname, rev)
     local cmd = 'git log --pretty=format:"\\' .. csname .. commit_format .. '" ' .. rev
     return cmdline(cmd)
 end
-
-api.commit = commit
 
 function api:get_tok()
     if self.cur_tok == nil then
@@ -254,7 +273,9 @@ function api:for_commit(csname, revspec, format)
         for _, commit in ipairs(log) do
             tex.print(tok)
             for _, value in ipairs(commit) do
-                tex.print('{' .. value .. '}')
+                texio.write_nl('value')
+                texio.write_nl(self:escape_str(value))
+                tex.print('{' .. self:escape_str(value) .. '}')
             end
         end
     else
