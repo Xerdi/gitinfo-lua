@@ -1,6 +1,5 @@
-
--- TODO: Set git version as (attribute is counter)
--- TODO: Do the functions using \luaFunction table
+-- TODO: Expose simple macro's using token.set_macro (10.6.4)
+-- TODO: always return tuple result, error
 
 if not modules then
     modules = {}
@@ -17,14 +16,18 @@ local module = {
     actions = {}
 }
 
+modules[module.name] = module.info
+
+local api = {
+    cur_tok = nil,
+    cmd = require('git-cmd')
+}
 local mt = {
-    __index = module.actions,
+    __index = api,
     __newindex = nil
 }
-local api = {}
-setmetatable(api, mt)
-
-modules[module.name] = module.info
+local git_latex = {}
+setmetatable(git_latex, mt)
 
 local cache = {}
 local cmds = {}
@@ -35,21 +38,9 @@ local function trim(s)
 end
 
 local function cmdline(cmd)
-    if directory then
-        cmd = 'cd ' .. directory .. '; ' .. cmd
-    end
-    local f = io.popen(cmd)
-    if f == nil then
-        tex.error("ERROR: Couldn't execute git command.\n\tIs option '-shell-escape' turned on?")
-        return ''
-    end
-    local s = f:read('*a')
-    if f:close() then
-        return s
-    else
-        texio.write_nl('Error executing git command')
-        return nil
-    end
+    -- deprecated
+    local _cmd = string.gsub(cmd, 'git ', '')
+    return api.cmd:exec(_cmd)
 end
 
 local function mk_action(name, func, output)
@@ -60,7 +51,7 @@ local function mk_action(name, func, output)
             func(...)
         end
     end
-    module.actions[name] = _call_action
+    api[name] = _call_action
 end
 local function register_cached_command(name, command)
     if not cache[command] then
@@ -151,20 +142,126 @@ local function commit(csname, rev)
     return cmdline(cmd)
 end
 
-module.actions.commit = commit
+api.commit = commit
 
-local function for_commit(csname, revspec)
-    local name = 'commit_' .. csname
-    local cmd = 'git log --no-merges --pretty=format:"\\' .. csname .. commit_format .. '"'
-    if revspec and revspec:match('.+%.%.%..+') then
-        cmd = cmd .. ' ' .. revspec
-        name = name .. '_' .. revspec
+function api:get_tok()
+    if self.cur_tok == nil then
+        self.cur_tok = token.get_next()
     end
-    register_cached_command(name, cmd)
-    return cmds[name]() or ''
+    return self.cur_tok
 end
 
-module.actions.for_commit = for_commit
+function api:parse_opts()
+    local tok = self:get_tok()
+    if tok.cmdname == 'other_char' then
+        --token.put_next(tok)
+        local opts = token.scan_word()
+        self.cur_tok = nil
+        -- todo: parse []
+        return opts
+    end
+end
+
+function api:parse_arguments(argc)
+    local result_list = {}
+    for _ = 1, argc do
+        local tok = self:get_tok()
+        if tok.cmdname == 'left_brace' then
+            token.put_next(tok)
+            table.insert(result_list, token.scan_argument())
+            self.cur_tok = nil
+        else
+            tex.error("Expected left brace")
+            return
+        end
+    end
+    return table.unpack(result_list)
+end
+
+function api:parse_macro()
+    --tex.print('\\noexpand')
+    local tok = self:get_tok()
+    if (tok.cmdname == 'call') or tok.cmdname == 'long_call' then
+        self.cur_tok = nil
+        return tok
+    else
+        print(tok.cmdname)
+        tex.error("Expected Macro")
+        for i = 1, 5 do
+            local _tok = token.get_next()
+            print('token', i, _tok.cmdname)
+        end
+    end
+end
+
+function api:test(csname, opts)
+    print('CSNAME', csname)
+    print('OPTS', opts)
+    if csname == '' then
+        local tok = self:get_tok()
+        print('TRY', tok.cmdname)
+    end
+    --local opts = self:parse_opts()
+    --print('OPTS', opts)
+    --local tok = self:get_tok()
+    --local csname
+    --local macro
+    --if tok.cmdname == 'left_brace' then
+    --    csname = self:parse_arguments(1)
+    --    print('CSNAME', csname)
+    --else
+    --    macro = self:parse_macro()
+    --    print('MACRO', macro and 'true' or 'false')
+    --end
+    --local macro, csname, opts
+    --local content_toks = {}
+    --local first_tok = token.get_next();
+    --if first_tok.cmdname == 'left_brace' then
+    --    token.put_next(first_tok)
+    --    csname = token.scan_string()
+    --    print('CSNAME', csname)
+    --elseif first_tok.cmdname == 'other_char' then
+    --    token.put_next(first_tok)
+    --    opts = token.scan_string()
+    --    print('OPTS', opts)
+    --else
+    --    print('Unknown token', first_tok.cmdname)
+    --end
+
+    --print('TOKEN ' .. (first_tok.cmdname or 'nil'), (first_tok.mode or 'nil'))
+    --token.put_next(first_tok)
+    --print('STRING ' .. (token.scan_word() or 'nil'))
+    --print('CS_NAME ' .. (token.scan_csname() or 'nil'))
+    --print('STRING ' .. token.scan_word() or 'nil')
+
+    --print('STRING ' .. (token.scan_string() or 'nil'))
+    --local toks = token.scan_toks()
+    --for _, tok in ipairs(toks) do
+    --    print('TOK ' .. (tok.cmdname or 'nil') .. ' | ' .. (tok.command or 'nil'))
+    --end
+    --local list = token.scan_list()
+    --print('LIST: ' .. type(list))
+    --local tok = token.get_next()
+    --texio.write_nl('attrs ' .. type(tok) .. ' ' .. (tok.cmdname or 'nil'))
+    --token = token.get_next()
+    --texio.write_nl('attrs ' .. type(tok) .. ' ' .. (tok.cmdname or 'nil'))
+end
+
+function api:for_commit(csname, revspec, format)
+    if token.is_defined(csname) then
+        local tok = token.create(csname)
+        local log = self.cmd:log(format, revspec)
+        for _, commit in ipairs(log) do
+            tex.print(tok)
+            for _, value in ipairs(commit) do
+                tex.print('{' .. value .. '}')
+            end
+        end
+    else
+        tex.error('ERROR: \\' .. csname .. ' not defined')
+        return
+    end
+end
 --mk_action('for_commit', for_commit, true)
 
 local tag_format = '{%(refname:short)}%(if)%(taggername)%(then){%(taggername)}{%(taggeremail)}{%(taggerdate:short)}%(else){%(authorname)}{%(authoremail)}{%(authordate:short)}%(end){%(subject)}{%(body)}'
@@ -176,7 +273,7 @@ local function for_tag(csname)
     return cmds[name]() or ''
 end
 
-module.actions.for_tag = for_tag
+api.for_tag = for_tag
 --mk_action('for_tag', for_tag, true)
 
 mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commits)
@@ -217,4 +314,4 @@ mk_action('directory', function(dir)
     directory = dir
 end, false)
 
-return api
+return git_latex

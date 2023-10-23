@@ -74,7 +74,8 @@
 \fi%
 }
 
-\newcommand*\forgitcommit[1]{#1}
+\newcommand{\forgitcommit}[3][h,an,ae,as,s,b]{\directlua{git:for_commit('#2', '#3', '#1')}}
+
 
 \ifgit@setmacros
     \ifgit@multipleauthors

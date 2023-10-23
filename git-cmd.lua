@@ -132,7 +132,7 @@ function api:log(format_spec, revision, options, git_dir)
         end
         cmd = cmd .. ' ' .. table.concat(options, ' ')
     end
-    if revision then
+    if revision and revision ~= '' then
         cmd = cmd .. ' ' .. revision
     end
     local cmd_response, err = self:exec(cmd, true, git_dir)
