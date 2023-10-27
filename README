@@ -19,7 +19,7 @@ export INSTALL_PATH=~/texmf
 make install
 ```
 
-Note that when using the existing `~/texmf` directory, one shouldn't use `make uninstall`, for that also erases your existing files in `~/texmf`.
+Note that when using the existing `~/texmf` directory, one should **NOT** use `make uninstall`, for that also erases your existing files in `~/texmf`.
 
 For adding a TDS directory manually consult the documentation of TDS.
 For Debian systems it's pretty straightforward.
