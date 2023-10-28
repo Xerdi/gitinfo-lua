@@ -52,7 +52,7 @@
     \ifcsname href\endcsname%
         \href{mailto:#2}{\textlangle#2\textrangle}%
     \else%
-        \texttt{\textlangle#2\textrangle}%
+        \textlangle\texttt{#2}\textrangle%
     \fi%
 }
 
@@ -74,6 +74,7 @@
 \fi%
 }
 
+\newcommand{\gitcommit}[3][h,an,ae,as,s,b]{\directlua{git:commit('#2', '#3', '#1')}}
 \newcommand{\forgitcommit}[3][h,an,ae,as,s,b]{\directlua{git:for_commit('#2', '#3', '#1')}}
 
 
