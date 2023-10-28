@@ -1,0 +1,281 @@
+\documentclass{ltxdoc}
+\usepackage[english]{babel}
+\usepackage[nonewpage]{imakeidx}
+\usepackage[authors,titlepage,email]{git}
+
+\usepackage{listings}
+
+\usepackage{calc}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{textcomp}
+
+\usepackage[orig,english]{isodate}
+
+\title{\texttt{Git} \LaTeX{} package}
+
+\def\cmd{\lstinline[style=TeX]}
+\def\ifempty#1{\def\temp{#1}\ifx\temp\empty}
+\newcommand\largs[1]{{\ttfamily (}\textlangle\textit{#1}\textrangle{\ttfamily{)}}}
+%\def\cmd{\lstinline[style=LaTeX]}
+\newcommand\MentionLua[1]{\lstinline[language={[5.3]Lua}]{git.#1}\index[lua]{#1}}
+\newcommand\DescribeLua[2][]{\ifempty{#1}\quad\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
+\newcommand\DescribeLuaFunc[2][]{\ifempty{#1}{\ttfamily()}\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
+
+%\CodelineIndex
+%\EnableCrossrefs
+%\makeindex[name=lua,title={Lua {\ttfamily git.}\textlangle {\itshape functions}\textrangle},columns=1]
+%\makeindex[name=pkgopts,title={Package Options},columns=1]
+%\makeindex[options=-s gind.ist,title={Macro's},columns=1]
+%\indexsetup{level=\subsection*}
+
+\usepackage{hyperref}
+
+\begin{document}
+    \RecordChanges
+
+    \maketitle
+
+    \begin{abstract}
+        This project aims to display git project information in PDF documents.
+        It's mostly written in Lua for executing the \texttt{git} commands.
+        For \LaTeX{} it provides a set of standard macro's for displaying basic information or setting the project directory, and a set of advanced macro's for commits and tags.
+        The advanced macro's also have iterating variants in order to generate changelogs or display multiple authors.
+    \end{abstract}
+
+    \begin{multicols}{2}
+    \tableofcontents
+    \lstlistoflistings
+    \end{multicols}
+    \clearpage
+
+    \section{Usage}
+    For the package to work one should work, and only work, with Lua\TeX{}.
+    Another prerequisite is that there is an available git repository either in the working directory, or somewhere else on your machine (see section~\ref{sub:tex-basic} for \LaTeX{}, or~\ref{sub:lua-basic} for \texttt{Lua}).
+
+    \subsection{Git}
+    For this package to work at a minimum, there has to be an initialized Git repository, and preferably, at least with one commit.
+    For example, the following minimal example should do the trick already:
+    \begin{lstlisting}[style=bash,frame=single,caption={Minimal Git setup}]
+mkdir my_project
+cd my_project
+echo "# My Project" > README.md
+git init && git commit -am "Init"
+    \end{lstlisting}
+
+    Then in order for the changelog to work, the project needs to contain either `lightweight-' or `annotated' tags.
+    The main difference is that a lightweight tag takes no extra options, for example: \lstinline[style=Bash]{git tag 0.1}.
+    See listing~\ref{lst:scenario} for more examples on authoring and versioning with \texttt{git}.
+
+    \subsection{Lua\LaTeX{}}
+
+    For generating the document with \LaTeX{} one should make use of \lstinline|lualatex|.
+    For example, when having the main file `\texttt{main.tex}':
+    \begin{lstlisting}[style=bash,frame=single,caption={Generating the document with \LaTeX{}}]
+# Generate once
+lualatex -shell-escape main
+# Generate and keep watching with LaTeXMK
+latexmk -pvc -lualatex -shell-escape main
+    \end{lstlisting}
+    Note that in both cases option `-shell-escape' is required.
+    This is required for issuing \texttt{git} via the commandline.
+
+    \subsection{Lua\TeX{}}
+    If you'd like to do it from Lua directly, one can require it as follows:
+    \begin{lstlisting}[language={[5.3]Lua},frame=single,caption={Importing git-latex from Lua}]
+local git = require('git-latex')
+-- Print project version to the log
+texio.write_nl('My Project v' .. git.version())
+    \end{lstlisting}
+
+
+    \section{LaTeX Interface}
+
+    \subsection{Package Options}
+
+    \begin{center}
+        \cmd{\usepackage}%
+        \oarg{lastcommit\textbar tags, author\textbar authors, alpha\textbar contrib, titlepage}%
+        \texttt{\textbraceleft git\textbraceright}\index[pkgopts]{git(.sty)}
+    \end{center}
+
+    \subsection{Basic Macro's}\label{sub:tex-basic}
+
+    \noindent
+    \DescribeMacro{\gitdirectory}
+    \DescribeMacro{\gitunsetdirectory}
+
+    \noindent
+    \DescribeMacro{\gitversion}
+
+    \noindent
+    \DescribeMacro{\gitauthor}
+
+    \noindent
+    \DescribeMacro{\gitemail}
+
+    \noindent
+    \DescribeMacro{\gitdate}
+
+    \subsection{Multiple Authors}
+
+    \noindent
+    \DescribeMacro{\forgitauthor}
+    \oarg{conjunction} maybe always accept 2 args for doAuthor
+
+    \subsection{Commits}
+
+    \noindent
+    \DescribeMacro{\gitcommit}\oarg{format}\marg{csname}\marg{revision}\\
+    For displaying commit data \cmd{\gitcommit} can be used.
+    The optional \texttt{format} takes variables separated by a comma.
+    The default \texttt{format} is \texttt{h,an,ae,as,s,b}.
+    The \texttt{csname} is a user defined command accepting every variable as argument.\\
+
+    \newlength\xample
+    \setlength\xample{6cm-5pt}
+    \newlength\xamplesep
+    \setlength\xamplesep{5pt}
+    \noindent
+    \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
+        \noindent
+        For example:
+        \begin{lstlisting}[style=tex,numbers=left]
+\newcommand{\formatcommit}[3]%
+{#1, by #2 on \printdate{#3}}
+
+\gitcommit[s,an,as]%
+{formatcommit}{75dc036}
+        \end{lstlisting}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{\xample}
+        \noindent
+        Results in:\\
+
+        \noindent
+        \setlength{\fboxsep}{5pt}%
+        \newcommand\formatcommit[3]{#1, by #2 on \printdate{#3}}%
+        \fbox{\parbox{\linewidth-2\fboxsep}{\gitcommit[s,an,as]{formatcommit}{75dc036}\footnotemark}}
+    \end{minipage}\\
+    \footnotetext{\texttt{\textbackslash printdate} from \texttt{isodate}: \url{https://www.ctan.org/pkg/isodate}}
+
+    Consult \texttt{man git-log} for possible format variables and omit the \% for every variable.\\
+
+    \noindent
+    \DescribeMacro{\forgitcommit}\oarg{format}\marg{csname}\marg{rev\_spec}\\
+    For displaying multiple commits the~\cmd{\forgitcommit} is used, which has the same arguments as \cmd{\gitcommit}, but only this time the \texttt{csname} is executed for every commit.
+    The last argument \texttt{rev\_spec} this time, however, can have no argument or a sequence.\\
+    \noindent\setlength\xample{5.7cm}
+    \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
+        \noindent
+        For example:
+        \noindent
+        \begin{lstlisting}[style=TeX,numbers=left]
+\newcommand{\formatcommits}[2]%
+{\item #1\\\quad —#2}
+
+\begin{itemize}
+    \forgitcommit[s,an]%
+    {formatcommits}%
+    {75dc036...e51c481}
+\end{itemize}
+        \end{lstlisting}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{\xample}
+        \noindent
+        Results in:\\
+
+        \noindent
+        \newcommand\formatcommits[2]{\item #1\\\quad —#2}%
+        \setlength{\fboxsep}{0pt}%
+        \fbox{\parbox{\linewidth}{%
+            \begin{itemize}
+                \forgitcommit[s,an]
+                {formatcommits}
+                {75dc036...e51c481}
+            \end{itemize}
+        }}
+    \end{minipage}\\
+
+    \subsection{Tags}
+
+    \noindent
+    \DescribeMacro{\forgittag}
+
+    \noindent
+    \DescribeMacro{\forgittagcommit}
+
+
+    \section{Lua Interface}
+
+    \subsection{Basic Functions}\label{sub:lua-basic}
+    \DescribeLuaFunc[new\_directory]{directory}\\
+    \DescribeLuaFunc{set\_date}\\
+    \DescribeLuaFunc{version}\\
+    \DescribeLuaFunc{author}\\
+    \DescribeLuaFunc{email}\\
+    \DescribeLuaFunc{commit\_date}\\
+
+    \subsection{Multiple Authors}
+    \DescribeLuaFunc[csname, conj, append\_email, sort]{for\_author}\\
+
+    \subsection{Commits and Tags}
+    \DescribeLuaFunc{tag\_list}\\
+    \DescribeLuaFunc[csname, rev]{commit}\\
+    \DescribeLuaFunc[csname, revspec]{for\_commit}\\
+    \DescribeLuaFunc[csname]{for\_tag}\\
+    \DescribeLuaFunc[csname\_tag, csname\_commit, after\_commits]{for\_tag\_and\_commit}\\
+%
+    % todo .cfg layered pages & code over ltxdocs
+%    % Remove caching
+%    \gitdirectory{../../tex-workspace}
+%    \forgitauthor[, ]\\[2em]
+%    \gitunsetdirectory
+%    \gitdirectory{../../ginvoice}
+%    Ginvoice
+%    \gitversion\\
+%    \directlua{git.tag_list()}
+%
+%    \newcommand\formattag[6]{\item #1, #4\\—#2 \textlangle#3\textrangle\begin{itemize}}
+%    \newcommand\formatcommit[5]{\item \textbf{#1}\quad #2\\#3, #4\\[2em]#5}
+%%    \newcommand\printchangelog[1]{\directlua{git.for_tag_and_commit('formattag', 'formatcommit', '#1')}}
+%    \begin{itemize}
+%        \gitcommit[h,s,as,an,b]{formatcommit}{75dc036}
+%        \forgitcommit[h,s,as,an,b]{formatcommit}{}
+%%        \forgitcommit[h,s,as,an]{nonexisting}{}
+%%        \forgitcommit[h,s,as,an]{formatcommit}{e51c481...df76269}
+%    \end{itemize}
+%    \begin{itemize}
+%        \printchangelog{\\end{itemize}}
+%    \end{itemize}
+
+    \section{Installation}
+
+    \subsection{Building the Documentation}
+    This documentation uses an example \texttt{project} which gets created by the \texttt{git-scenario.sh} script (see listing~\ref{lst:scenario}).
+    It creates some commits having dates in the past and different authors set.
+    Lastly it creates a `lightweight-' and `annotated' tag.
+
+    To set up this scenario either use the \texttt{Makefile} or a bash shell directly.
+    \begin{lstlisting}[style=bash,morekeywords={make,bash}]
+# Using Bash
+bash git-scenario.sh
+# Using Make
+make scenario
+    \end{lstlisting}
+
+    \lstinputlisting[style=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
+
+
+    \gitunsetdirectory
+
+%    \PrintIndex
+%    \section*{Index}
+%    \addcontentsline{toc}{section}{Index}
+%    \begin{multicols}{2}
+%        \printindex[pkgopts]
+%        \printindex
+%        \printindex[lua]
+%    \end{multicols}
+\end{document}
