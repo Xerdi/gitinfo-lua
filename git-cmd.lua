@@ -127,7 +127,7 @@ function api:log(format_spec, revision, options, git_dir)
     local format = self:parse_format_spec(format_spec)
     local cmd = 'log --pretty=format:"' .. format .. '"'
     if options then
-        for idx, opt in options do
+        for idx, opt in ipairs(options) do
             options[idx] = '--' .. opt
         end
         cmd = cmd .. ' ' .. table.concat(options, ' ')
