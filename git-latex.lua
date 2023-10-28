@@ -11,7 +11,7 @@ local module = {
         version = 0.001,
         comment = "Git LaTeX — Git integration with LaTeX",
         author = "Erik Nijenhuis",
-        license = "gplv3"
+        license = "free"
     },
     actions = {}
 }
@@ -23,7 +23,7 @@ local api = {
     cmd = require('git-cmd'),
     escape_chars = {
         ['&'] = '\\&',
-        ['%%'] = '\\%',
+        ['%%'] = '\\%%',
         ['%$'] = '\\$',
         ['#'] = '\\#',
         ['_'] = '\\_',
@@ -155,14 +155,6 @@ function api:escape_str(value)
     return buf
 end
 
-local commit_format = '{%h}{%an}{%ae}{%as}{%s}{%b}'
-
--- todo make method
-function api.commit(csname, rev)
-    local cmd = 'git log --pretty=format:"\\' .. csname .. commit_format .. '" ' .. rev
-    return cmdline(cmd)
-end
-
 function api:get_tok()
     if self.cur_tok == nil then
         self.cur_tok = token.get_next()
@@ -213,77 +205,44 @@ function api:parse_macro()
     end
 end
 
-function api:test(csname, opts)
-    print('CSNAME', csname)
-    print('OPTS', opts)
-    if csname == '' then
-        local tok = self:get_tok()
-        print('TRY', tok.cmdname)
+local commit_format = '{%h}{%an}{%ae}{%as}{%s}{%b}'
+
+function api:commit(csname, rev, format)
+    if token.is_defined(csname) then
+        print('COMMIT', format, rev, csname)
+        local tok = token.create(csname)
+        local log, err = self.cmd:log(format, rev, {'max-count=1'})
+        if log then
+            if #log == 1 then
+                tex.print(tok)
+                for _, value in ipairs(log[1]) do
+                    tex.print('{' .. self:escape_str(value) .. '}')
+                end
+            else
+                texio.write_nl('Warning: commit returned none')
+            end
+        else
+            tex.error('ERROR: ' .. (err or 'nil'))
+        end
+    else
+        tex.error('ERROR: \\' .. csname .. ' not defined')
     end
-    --local opts = self:parse_opts()
-    --print('OPTS', opts)
-    --local tok = self:get_tok()
-    --local csname
-    --local macro
-    --if tok.cmdname == 'left_brace' then
-    --    csname = self:parse_arguments(1)
-    --    print('CSNAME', csname)
-    --else
-    --    macro = self:parse_macro()
-    --    print('MACRO', macro and 'true' or 'false')
-    --end
-    --local macro, csname, opts
-    --local content_toks = {}
-    --local first_tok = token.get_next();
-    --if first_tok.cmdname == 'left_brace' then
-    --    token.put_next(first_tok)
-    --    csname = token.scan_string()
-    --    print('CSNAME', csname)
-    --elseif first_tok.cmdname == 'other_char' then
-    --    token.put_next(first_tok)
-    --    opts = token.scan_string()
-    --    print('OPTS', opts)
-    --else
-    --    print('Unknown token', first_tok.cmdname)
-    --end
-
-    --print('TOKEN ' .. (first_tok.cmdname or 'nil'), (first_tok.mode or 'nil'))
-    --token.put_next(first_tok)
-    --print('STRING ' .. (token.scan_word() or 'nil'))
-    --print('CS_NAME ' .. (token.scan_csname() or 'nil'))
-    --print('STRING ' .. token.scan_word() or 'nil')
-
-    --print('STRING ' .. (token.scan_string() or 'nil'))
-    --local toks = token.scan_toks()
-    --for _, tok in ipairs(toks) do
-    --    print('TOK ' .. (tok.cmdname or 'nil') .. ' | ' .. (tok.command or 'nil'))
-    --end
-    --local list = token.scan_list()
-    --print('LIST: ' .. type(list))
-    --local tok = token.get_next()
-    --texio.write_nl('attrs ' .. type(tok) .. ' ' .. (tok.cmdname or 'nil'))
-    --token = token.get_next()
-    --texio.write_nl('attrs ' .. type(tok) .. ' ' .. (tok.cmdname or 'nil'))
 end
 
 function api:for_commit(csname, revspec, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local log = self.cmd:log(format, revspec)
+        local log, err = self.cmd:log(format, revspec)
         for _, commit in ipairs(log) do
             tex.print(tok)
             for _, value in ipairs(commit) do
-                texio.write_nl('value')
-                texio.write_nl(self:escape_str(value))
                 tex.print('{' .. self:escape_str(value) .. '}')
             end
         end
     else
         tex.error('ERROR: \\' .. csname .. ' not defined')
-        return
     end
 end
---mk_action('for_commit', for_commit, true)
 
 local tag_format = '{%(refname:short)}%(if)%(taggername)%(then){%(taggername)}{%(taggeremail)}{%(taggerdate:short)}%(else){%(authorname)}{%(authoremail)}{%(authordate:short)}%(end){%(subject)}{%(body)}'
 
