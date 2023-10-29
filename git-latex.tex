@@ -1,6 +1,5 @@
 \documentclass{ltxdoc}
 \usepackage[english]{babel}
-\usepackage[nonewpage]{imakeidx}
 \usepackage[authors,titlepage,email]{git}
 
 \usepackage{listings}
@@ -23,14 +22,16 @@
 \newcommand\DescribeLua[2][]{\ifempty{#1}\quad\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
 \newcommand\DescribeLuaFunc[2][]{\ifempty{#1}{\ttfamily()}\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
 
-%\CodelineIndex
-%\EnableCrossrefs
-%\makeindex[name=lua,title={Lua {\ttfamily git.}\textlangle {\itshape functions}\textrangle},columns=1]
-%\makeindex[name=pkgopts,title={Package Options},columns=1]
-%\makeindex[options=-s gind.ist,title={Macro's},columns=1]
-%\indexsetup{level=\subsection*}
-
 \usepackage{hyperref}
+\usepackage[nonewpage]{imakeidx}
+
+\CodelineIndex
+\EnableCrossrefs
+\makeindex[name=lua,title={Lua {\ttfamily git.}\textlangle {\itshape functions}\textrangle},columns=1]
+\makeindex[name=pkgopts,title={Package Options},columns=1]
+\makeindex[title={Macro's},columns=1]
+
+\indexsetup{level=\subsection*}
 
 \begin{document}
     \RecordChanges
@@ -270,12 +271,12 @@ make scenario
 
     \gitunsetdirectory
 
-%    \PrintIndex
-%    \section*{Index}
-%    \addcontentsline{toc}{section}{Index}
-%    \begin{multicols}{2}
-%        \printindex[pkgopts]
-%        \printindex
-%        \printindex[lua]
-%    \end{multicols}
+    \PrintIndex
+    \section*{Index}
+    \addcontentsline{toc}{section}{Index}
+    \begin{multicols}{2}
+        \printindex[pkgopts]
+        \printindex
+        \printindex[lua]
+    \end{multicols}
 \end{document}
