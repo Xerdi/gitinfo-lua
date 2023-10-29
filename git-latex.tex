@@ -102,22 +102,29 @@ texio.write_nl('My Project v' .. git.version())
     \end{center}
 
     \subsection{Basic Macro's}\label{sub:tex-basic}
+    By default the main file's directory is used as git project directory.
+    This directory can be manipulated with \DescribeMacro{\gitdirectory}\cmd{\gitdirectory}\marg{path}.
+    This is only tested with relative paths on Linux.
+    \DescribeMacro{\gitunsetdirectory} To undo this operation and switch back to the main file's directory use \cmd{\gitunsetdirectory}.\\
 
     \noindent
-    \DescribeMacro{\gitdirectory}
-    \DescribeMacro{\gitunsetdirectory}
-
-    \noindent
-    \DescribeMacro{\gitversion}
+    \DescribeMacro{\gitversion} The current version can be display by using \cmd{\gitversion}.
+    For this project \cmd{\gitversion} results in \gitversion.
+    When the version is dirty it will be post fixed with \texttt{-<commit count>-<short ref>}.
+    For example, when this paragraph was written, the version was displaying 0.0.1-14-gcc2bc30.
+    For changing contents depending on whether the version is dirty or not one can use \cmd{\ifgitdirty}\DescribeMacro{\ifgitdirty}.\\
 
     \noindent
     \DescribeMacro{\gitauthor}
+    \gitauthor
 
     \noindent
     \DescribeMacro{\gitemail}
+    \gitemail
 
     \noindent
     \DescribeMacro{\gitdate}
+    \gitdate
 
     \subsection{Multiple Authors}
 
@@ -271,7 +278,8 @@ make scenario
 
     \gitunsetdirectory
 
-    \PrintIndex
+%    \PrintIndex
+    \clearpage
     \section*{Index}
     \addcontentsline{toc}{section}{Index}
     \begin{multicols}{2}
