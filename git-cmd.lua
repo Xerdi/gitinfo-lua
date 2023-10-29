@@ -48,18 +48,6 @@ function api:exec(command, do_caching, target_dir)
     end
 end
 
-function api:config(args, git_dir)
-    local cmd = 'config'
-    if type(args) == 'string' then
-        cmd = cmd .. ' ' .. args
-    elseif type(args) == 'table' then
-        cmd = cmd .. ' ' .. table.concat(args, ' ')
-    else
-        return nil, "Wrong type given for config command (" .. type(args) .. ")"
-    end
-    return self:exec(cmd, true, git_dir)
-end
-
 function api:format_attribute(attribute, no_separator)
     if string.find(attribute, '%w:%w') then
         attribute = '%(' .. attribute .. ')'

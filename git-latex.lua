@@ -78,12 +78,6 @@ local function register_command_action(action, command)
     mk_action(action, cmds[action], true)
 end
 
--- Direct actions
-register_command_action('version', 'git describe --tags --always')
-register_command_action('author', 'git config user.name')
-register_command_action('email', 'git config user.email')
-register_command_action('commit_date', 'git log -1 --date=format:"%Y/%m/%d" --format="%ad"')
-
 -- Multiple author actions
 register_cached_command('authors_alpha', 'git shortlog -s HEAD')
 register_cached_command('authors_alpha_with_emails', 'git shortlog -se HEAD')
@@ -91,7 +85,6 @@ register_cached_command('authors_contrib', 'git shortlog -sn HEAD')
 register_cached_command('authors_contrib_with_emails', 'git shortlog -sne HEAD')
 
 -- Changelog actions
-register_cached_command('first_commit', 'git rev-list --max-parents=0 HEAD')
 register_command_action('tag_list', 'git tag -l --sort=-v:refname')
 register_cached_command('for_tag', 'git for-each-ref --format="{%(refname:short)}{%(taggername)}{%(taggeremail)}{%(taggerdate:short)}{%(subject)}{%(body)}" --sort=-committerdate refs/tags')
 register_cached_command('for_commit', 'git log --no-merges --pretty=format:"{%h}{%an}{%ae}{%as}{%s}{%b}"')
@@ -205,11 +198,49 @@ function api:parse_macro()
     end
 end
 
-local commit_format = '{%h}{%an}{%ae}{%as}{%s}{%b}'
+function api:dir(path)
+    self.cmd.cwd = path
+end
+
+function api:version()
+    local version, err = self.cmd:exec('describe --tags --always', true)
+    if version then
+        tex.write(version)
+    else
+        tex.error(err)
+    end
+end
+
+-- todo: prevent output to stderr
+function api:is_dirty()
+    local ok, _ = self.cmd:exec('describe --tags --exact-match')
+    if ok then
+        tex.write('false')
+    else
+        tex.write('true')
+    end
+end
+
+function api:local_author()
+    local name, err = self.cmd:exec('config user.name', true)
+    if name then
+        tex.write(name)
+    else
+        tex.error(err)
+    end
+end
+
+function api:local_email()
+    local name, err = self.cmd:exec('config user.email', true)
+    if name then
+        tex.write(name)
+    else
+        tex.error(err)
+    end
+end
 
 function api:commit(csname, rev, format)
     if token.is_defined(csname) then
-        print('COMMIT', format, rev, csname)
         local tok = token.create(csname)
         local log, err = self.cmd:log(format, rev, {'max-count=1'})
         if log then
@@ -227,6 +258,14 @@ function api:commit(csname, rev, format)
     else
         tex.error('ERROR: \\' .. csname .. ' not defined')
     end
+end
+
+function api:first_commit()
+    return self.cmd:exec('git rev-list --max-parents=0 HEAD', true)
+end
+
+function api:last_commit(csname, format)
+    return self:commit(csname, '-1', format)
 end
 
 function api:for_commit(csname, revspec, format)
@@ -259,7 +298,7 @@ api.for_tag = for_tag
 mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commits)
     local sequence = {}
     local tags_result = for_tag(csname_tag)
-    local first_commit = cmds.first_commit()
+    local first_commit = cmds:first_commit()
     local tag_list = cmds.tag_list() .. first_commit
     for version_tag in tag_list:gmatch("(.-)\n") do
         table.insert(sequence, version_tag)
@@ -287,11 +326,6 @@ mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commit
         end
         cur_rev = sequence[i]
     end
-end, false)
-
-mk_action('directory', function(dir)
-    cache = {}
-    directory = dir
 end, false)
 
 return git_latex

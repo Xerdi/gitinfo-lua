@@ -38,19 +38,21 @@
 
 \makeatletter
 
-\newcommand*\gitversion{\directlua{git.version()}}
-\newcommand*\gitauthor{\directlua{git.author()}}
-\newcommand*\gitemail{\directlua{git.email()}}
-\newcommand*\gitdate{\directlua{git.commit_date()}}
-\newcommand*\gitdirectory[1]{\directlua{git.directory('#1')}}
-\newcommand*\gitunsetdirectory{\directlua{git.directory(nil)}}
+\newcommand*\git@single@arg[1]{#1}
+
+\newcommand*\gitversion{\directlua{git:version()}}
+\newcommand*\gitauthor{\directlua{git:local_author()}}
+\newcommand*\gitemail{\directlua{git:local_email()}}
+\newcommand*\gitdate{\directlua{git:last_commit('git@single@arg', 'cs')}}
+\newcommand*\gitdirectory[1]{\directlua{git:dir('#1')}}
+\newcommand*\gitunsetdirectory{\directlua{git:dir(nil)}}
 
 \newcommand\author@conjunction{,~}
 \newcommand\doAuthor[1]{#1}
 \newcommand\doAuthorAndEmail[2]{%
     #1
     \ifcsname href\endcsname%
-        \href{mailto:#2}{\textlangle#2\textrangle}%
+        \textlangle\href{mailto:#2}{#2}\textrangle%
     \else%
         \textlangle\texttt{#2}\textrangle%
     \fi%
@@ -84,8 +86,9 @@
     \else
         \author{\gitauthor}
     \fi
-    \directlua{git.set_date()}
-    \date{\today}
+% todo: fix set_date
+%    \directlua{git.set_date()}
+%    \date{\today}
 \fi
 
 \endinput
