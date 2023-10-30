@@ -33,6 +33,11 @@
 
 \indexsetup{level=\subsection*}
 
+\newlength\xample
+\newlength\xamplesep
+\setlength\xample{6cm-5pt}
+\setlength\xamplesep{5pt}
+
 \begin{document}
     \RecordChanges
 
@@ -108,58 +113,69 @@ texio.write_nl('My Project v' .. git.version())
     \DescribeMacro{\gitunsetdirectory} To undo this operation and switch back to the main file's directory use \cmd{\gitunsetdirectory}.\\
 
     \noindent
-    \DescribeMacro{\gitversion} The current version can be display by using \cmd{\gitversion}.
+    \DescribeMacro{\gitversion} The current version can be display by using \cmd{\gitversion} and is equivalent to \texttt{git describe --tags --always}, working for both lightweight and annotated tags.
     For this project \cmd{\gitversion} results in \gitversion.
     When the version is dirty it will be post fixed with \texttt{-<commit count>-<short ref>}.
-    For example, when this paragraph was written, the version was displaying 0.0.1-14-gcc2bc30.
-    For changing contents depending on whether the version is dirty or not one can use \cmd{\ifgitdirty}\DescribeMacro{\ifgitdirty}.\\
+    For example, when this paragraph was written, the version was displaying 0.0.1-14-gcc2bc30.\\
+%    For changing contents depending on whether the version is dirty or not one can use \cmd{\ifgitdirty}\DescribeMacro{\ifgitdirty}.\\
 
-    \noindent
-    \DescribeMacro{\gitauthor}
-    \gitauthor
+    The \DescribeMacro{\gitdate}\cmd{\gitdate} macro gets the most recent date from the git log.
+    Meaning, the last `short date' variant is picked from the last commit.
+    This short date is formatted ISO based and is already suitable for use in packages like \texttt{isodate} for more advanced date formatting.\\
 
-    \noindent
-    \DescribeMacro{\gitemail}
-    \gitemail
 
-    \noindent
-    \DescribeMacro{\gitdate}
-    \gitdate
+    The author's name and email can be accessed using \cmd{\gitauthor} and \cmd{\gitemail}\DescribeMacro{\gitauthor}\DescribeMacro{\gitemail}.
+    These values are based on \texttt{git config user.name} and \texttt{git config user.email}.
 
     \subsection{Multiple Authors}
+    When projects having multiple authors this package can help with the \DescribeMacro{\dogitauthors}\cmd{\dogitauthors}\oarg{conj} and \DescribeMacro{\forgitauthors}\cmd{\forgitauthors}\oarg{conj}\marg{csname} macro.
+    Where \cmd{\dogitauthors} executes a default formatting implementation of \cmd{\git@format@author} and \cmd{\forgitauthors} executes the given \meta{csname} for every author available.
+    The optional \meta{conj} conjunction makes it possible to even integrate it further.
+    For example, when setting the authors in pdfx, the conjunction would be \texttt{[\textbackslash\textbackslash sep\textasciitilde]}, so that the authors are properly separated in the document properties\footnote{See package documentation of \texttt{pdfx}: \url{https://ctan.org/pkg/pdfx}}.
 
-    \noindent
-    \DescribeMacro{\forgitauthor}
-    \oarg{conjunction} maybe always accept 2 args for doAuthor
+    \gitdirectory{../git-test-project}%
+    \setlength\xample{4.6cm-5pt}%
+    \setlength\xamplesep{5pt}%
+    \noindent%
+    \begin{minipage}[t]{\linewidth-\xample-\xamplesep}%
+        \begin{lstlisting}[style=TeX,numbers=left,caption={Formatting authors},captionpos=t]
+\newcommand{\myauthorformat}[2]{#1 \href{mailto:#2}{#2}}
+\forgitauthors[\\]{myauthorformat}
+% Or using standard format
+\dogitauthors[\\]
+        \end{lstlisting}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{\xample}
+        \noindent
+        \begin{center}Results in\end{center}
+
+        \noindent
+        \setlength{\fboxsep}{5pt}%
+        \fbox{\parbox{\linewidth-2\fboxsep}{\dogitauthors[\\\\]}}
+    \end{minipage}\\
+    \gitunsetdirectory
+
 
     \subsection{Commits}
-
     \noindent
     \DescribeMacro{\gitcommit}\oarg{format}\marg{csname}\marg{revision}\\
     For displaying commit data \cmd{\gitcommit} can be used.
     The optional \texttt{format} takes variables separated by a comma.
     The default \texttt{format} is \texttt{h,an,ae,as,s,b}.
-    The \texttt{csname} is a user defined command accepting every variable as argument.\\
-
-    \newlength\xample
-    \setlength\xample{6cm-5pt}
-    \newlength\xamplesep
-    \setlength\xamplesep{5pt}
-    \noindent
+    The \texttt{csname} is a user defined command accepting every variable as argument.
+    \setlength\xample{3.5cm}%
+    \setlength\xamplesep{0pt}%
+    \noindent%
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
-        \noindent
-        For example:
-        \begin{lstlisting}[style=tex,numbers=left]
-\newcommand{\formatcommit}[3]%
-{#1, by #2 on \printdate{#3}}
+        \begin{lstlisting}[style=tex,numbers=left,caption={Formatting a commit},captionpos=t]
+\newcommand{\formatcommit}[3]{#1, by #2 on \printdate{#3}}
 
-\gitcommit[s,an,as]%
-{formatcommit}{75dc036}
+\gitcommit[s,an,as]{formatcommit}{75dc036}
         \end{lstlisting}
     \end{minipage}\hfill%
     \begin{minipage}[t]{\xample}
         \noindent
-        Results in:\\
+        \begin{center}Results in\end{center}
 
         \noindent
         \setlength{\fboxsep}{5pt}%
@@ -173,26 +189,22 @@ texio.write_nl('My Project v' .. git.version())
     \noindent
     \DescribeMacro{\forgitcommit}\oarg{format}\marg{csname}\marg{rev\_spec}\\
     For displaying multiple commits the~\cmd{\forgitcommit} is used, which has the same arguments as \cmd{\gitcommit}, but only this time the \texttt{csname} is executed for every commit.
-    The last argument \texttt{rev\_spec} this time, however, can have no argument or a sequence.\\
-    \noindent\setlength\xample{5.7cm}
+    The last argument \texttt{rev\_spec} this time, however, can have no argument or a sequence.
+
+    \noindent\setlength\xample{4.5cm}\setlength\xamplesep{0pt}
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
         \noindent
-        For example:
-        \noindent
-        \begin{lstlisting}[style=TeX,numbers=left]
-\newcommand{\formatcommits}[2]%
-{\item #1\\\quad —#2}
+        \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting commits}]
+\newcommand{\formatcommits}[2]{\item #1\\\quad —#2}
 
 \begin{itemize}
-    \forgitcommit[s,an]%
-    {formatcommits}%
-    {75dc036...e51c481}
+    \forgitcommit[s,an]{formatcommits}{75dc036...e51c481}
 \end{itemize}
         \end{lstlisting}
     \end{minipage}\hfill%
     \begin{minipage}[t]{\xample}
         \noindent
-        Results in:\\
+        \begin{center}Results in\end{center}
 
         \noindent
         \newcommand\formatcommits[2]{\item #1\\\quad —#2}%
