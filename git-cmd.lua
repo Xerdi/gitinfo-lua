@@ -48,6 +48,18 @@ function api:exec(command, do_caching, target_dir)
     end
 end
 
+function api:shortlog(sort_by_contrib, include_email, target_dir)
+    local cmd = 'shortlog -s'
+    if sort_by_contrib then
+        cmd = cmd .. 'n'
+    end
+    if include_email then
+        cmd = cmd .. 'e'
+    end
+    cmd = cmd .. ' HEAD'
+    return self:exec(cmd, true, target_dir)
+end
+
 function api:format_attribute(attribute, no_separator)
     if string.find(attribute, '%w:%w') then
         attribute = '%(' .. attribute .. ')'
@@ -86,14 +98,6 @@ end
 function api:parse_format_spec(spec)
     local format = self:_parse_format_spec(spec, 1)
     return format .. self.record_separator
-end
-
-function api:format_ref(attrs) -- deprecated
-    local str = ''
-    for attr in string.gmatch(attrs, '(%w+),-') do
-        str = str .. '%' .. attr .. self.attribute_separator
-    end
-    return str
 end
 
 function api:parse_log(buffer)
