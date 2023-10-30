@@ -87,9 +87,8 @@
     \else
         \author{\gitauthor}
     \fi
-% todo: fix set_date
-%    \directlua{git.set_date()}
-%    \date{\today}
+    \directlua{git:set_date()}
+    \date{\today}
 \fi
 
 \endinput

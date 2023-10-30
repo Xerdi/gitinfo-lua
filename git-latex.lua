@@ -86,15 +86,17 @@ register_cached_command('for_tag', 'git for-each-ref --format="{%(refname:short)
 register_cached_command('for_commit', 'git log --no-merges --pretty=format:"{%h}{%an}{%ae}{%as}{%s}{%b}"')
 register_cached_command('for_commit_tag', 'git for-each-ref --format="{%(refname:short)}{%(authorname)}{%(authoremail)}{%(authordate:shot)}" --sort=-committerdate refs/tags')
 
--- Custom actions
-mk_action('set_date', function()
-    local date = cmds.commit_date()
-    local _, _, year, month, day = date:find('(%d+)/(%d+)/(%d+)')
-    tex.year = tonumber(year)
-    tex.month = tonumber(month)
-    tex.day = tonumber(day)
-end, false)
-
+function api:set_date()
+    local date, err = self.cmd:log('cs', '-1', {'max-count=1'})
+    if date and #date == 1 then
+        local _, _, year, month, day = date[1][1]:find('(%d+)[-/](%d+)[-/](%d+)')
+        tex.year = tonumber(year)
+        tex.month = tonumber(month)
+        tex.day = tonumber(day)
+    else
+        return nil, (err or 'Length of output doesn\'t match one (attempt to set git date)')
+    end
+end
 
 function api:escape_str(value)
     local buf = string.gsub(value, '\\', '\\textbackslash')
