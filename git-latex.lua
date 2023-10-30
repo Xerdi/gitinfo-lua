@@ -44,7 +44,11 @@ local cache = {}
 local cmds = {}
 local directory
 
-local function trim(s)
+local function trim(s) -- deprecated
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+function api.trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
@@ -78,12 +82,6 @@ local function register_command_action(action, command)
     mk_action(action, cmds[action], true)
 end
 
--- Multiple author actions
-register_cached_command('authors_alpha', 'git shortlog -s HEAD')
-register_cached_command('authors_alpha_with_emails', 'git shortlog -se HEAD')
-register_cached_command('authors_contrib', 'git shortlog -sn HEAD')
-register_cached_command('authors_contrib_with_emails', 'git shortlog -sne HEAD')
-
 -- Changelog actions
 register_command_action('tag_list', 'git tag -l --sort=-v:refname')
 register_cached_command('for_tag', 'git for-each-ref --format="{%(refname:short)}{%(taggername)}{%(taggeremail)}{%(taggerdate:short)}{%(subject)}{%(body)}" --sort=-committerdate refs/tags')
@@ -97,46 +95,6 @@ mk_action('set_date', function()
     tex.year = tonumber(year)
     tex.month = tonumber(month)
     tex.day = tonumber(day)
-end, false)
-
-mk_action('for_author', function(csname, conj, append_email, sort)
-    local _sort = sort or 'contrib'
-    local cmd = 'authors_' .. _sort
-    if append_email then
-        cmd = cmd .. '_with_emails'
-    end
-    local data = cmds[cmd]()
-    if data then
-        if data:sub(-1) ~= '\n' then
-            data = data .. '\n'
-        end
-        local authors = {}
-        -- Convert to LaTeX lines into table authors
-        for line in data:gmatch("(.-)\n") do
-            if line then
-                if append_email then
-                    local author, email = line:match("^%s-%d+%s-(.-)<(.-)>%s-$")
-                    if author and email then
-                        table.insert(authors, '\\' .. csname .. '{' .. author .. '}{' .. email .. '}')
-                    end
-                else
-                    local author = line:match("^%s-%d+%s+(.-)%s-$")
-                    if author then
-                        table.insert(authors, '\\' .. csname .. '{' .. author .. '}')
-                    end
-                end
-            end
-        end
-        -- print to LaTeX with conjunctions
-        local len = #authors
-        local buffer = authors[1]
-        for i = 2, len do
-            buffer = buffer .. conj .. authors[i]
-        end
-        tex.print(buffer)
-    else
-        texio.write_nl('No response')
-    end
 end, false)
 
 
@@ -236,6 +194,28 @@ function api:local_email()
         tex.write(name)
     else
         tex.error(err)
+    end
+end
+
+function api:for_authors(csname, conjunction, sort_by_contrib)
+    if token.is_defined(csname) then
+        local tok = token.create(csname)
+        local authors, err = self.cmd:shortlog(sort_by_contrib, true)
+        if authors then
+            local next_conj
+            for line in authors:gmatch('(.-)\n') do
+                if next_conj then
+                    tex.print(next_conj)
+                end
+                next_conj = conjunction
+                local author, email = line:match("^%s-%d+%s-(.-)%s-<(.-)>%s-$")
+                tex.print(tok, '{' .. self:escape_str(self.trim(author)) .. '}', '{' .. self:escape_str(self.trim(email)) .. '}')
+            end
+        else
+            tex.error(err)
+        end
+    else
+        tex.error('ERROR: \\' .. csname .. ' not defined')
     end
 end
 

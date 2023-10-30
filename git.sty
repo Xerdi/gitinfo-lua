@@ -36,8 +36,6 @@
 
 \ProcessPgfPackageOptions*
 
-\makeatletter
-
 \newcommand*\git@single@arg[1]{#1}
 
 \newcommand*\gitversion{\directlua{git:version()}}
@@ -47,9 +45,7 @@
 \newcommand*\gitdirectory[1]{\directlua{git:dir('#1')}}
 \newcommand*\gitunsetdirectory{\directlua{git:dir(nil)}}
 
-\newcommand\author@conjunction{,~}
-\newcommand\doAuthor[1]{#1}
-\newcommand\doAuthorAndEmail[2]{%
+\newcommand\git@format@author[2]{%
     #1
     \ifcsname href\endcsname%
         \textlangle\href{mailto:#2}{#2}\textrangle%
@@ -58,21 +54,23 @@
     \fi%
 }
 
-\newcommand*\forgitauthor[1] % conjunction
-[\author@conjunction]
+\newcommand*\dogitauthors[1] % conjunction
+[,~]
 {%
-\ifgit@appendemail%
 \ifgit@sortalpha%
-\directlua{git.for_author('doAuthorAndEmail', '#1', true, 'alpha')}%
+\directlua{git:for_authors('git@format@author', '#1', false)}%
 \else%
-\directlua{git.for_author('doAuthorAndEmail', '#1', true, 'contrib')}%
+\directlua{git:for_authors('git@format@author', '#1', true)}%
 \fi%
-\else%
+}
+
+\newcommand*\forgitauthors[2] % conjunction
+[\authorconjunction]
+{%
 \ifgit@sortalpha%
-\directlua{git.for_author('doAuthor', '#1', false, 'alpha')}%
+\directlua{git:for_authors('#2', '#1', false)}%
 \else%
-\directlua{git.for_author('doAuthor', '#1', false, 'contrib')}%
-\fi%
+\directlua{git:for_authors('#2', '#1', true)}%
 \fi%
 }
 
@@ -82,7 +80,7 @@
 
 \ifgit@setmacros
     \ifgit@multipleauthors
-        \author{\forgitauthor[\\\\]}
+        \author{\dogitauthors[\\\\]}
     \else
         \author{\gitauthor}
     \fi
