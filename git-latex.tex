@@ -97,6 +97,7 @@ latexmk -pvc -lualatex -shell-escape main
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
     If option is set to \texttt{sort=contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \texttt{sort=alpha}.
+    Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macro's accordingly.
 
     \subsection{Basic Macro's}\label{sub:tex-basic}
     By default the main file's directory is used as git project directory.
@@ -144,10 +145,13 @@ latexmk -pvc -lualatex -shell-escape main
         \setlength{\fboxsep}{5pt}%
         \fbox{\parbox{\linewidth-2\fboxsep}{\dogitauthors[\\\\]}}
     \end{minipage}\\
+
+    This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:docs}) and is alphabetically sorted with package option \texttt{sort=alpha}.
     \gitunsetdirectory
-
-
     \subsection{Commits}
+    For this section the git project of this document is used due to the fact that there are references to revisions.
+    The test project's revisions change for every user, since they get recreated every time \texttt{test-scenario.sh} is executed (see section~\ref{sec:docs}).\\
+
     \noindent
     \DescribeMacro{\gitcommit}\oarg{format}\marg{csname}\marg{revision}\\
     For displaying commit data \cmd{\gitcommit} can be used.
@@ -208,16 +212,21 @@ latexmk -pvc -lualatex -shell-escape main
             \end{itemize}
         }}
     \end{minipage}\\
-
     \subsection{Tags}
-
-    \noindent
-    \DescribeMacro{\forgittag}
-    \DescribeMacro{\forgittagseq}
+    The tags are mostly useful for generating changelogs.
+    For formatting tags, there's a \DescribeMacro{\forgittag}\cmd{\forgittag}\oarg{format}\marg{csname}.
+    Again, like \cmd{\forgitcommit} it takes a format, however, this time more complex, since the formatting options differ between \texttt{git log} and \texttt{git for-each-ref}.
+    For more info regarding these formatting options consult the man page of \texttt{git-for-each-ref}.
+    For displaying commits in between tags, there's a \DescribeMacro{\forgittagseq}\cmd{\forgittagseq}\marg{csname}.
+    The \meta{csname} takes exactly two arguments, namely, the \meta{current} and \meta{next tag}, except for the last iteration.
+    The last iteration passes the initial commit as \meta{next tag}, so that the sequence of commits in between tags can be completed.
+    Afterward tag info get be fetched using the \DescribeMacro{\gittag}\cmd{\gittag}\oarg{format}\marg{csname}\marg{tag}.
+    This macro takes the same formatting specification as \cmd{\fotgittag}.
+    Beware of using \cmd{\gittag} for the \meta{next tag} parameter in \cmd{\forgittagseq}.
 
     \section{Installation}
 
-    \subsection{Building the Docs}
+    \subsection{Building the Docs}\label{sec:docs}
     This documentation uses an example \texttt{project} which gets created by the \texttt{git-scenario.sh} script (see listing~\ref{lst:scenario}).
     It creates some commits having dates in the past and different authors set.
     Lastly it creates a `lightweight-' and `annotated' tag.

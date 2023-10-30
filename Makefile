@@ -19,7 +19,7 @@ install: ${CONTRIBUTION}.tds.zip
 	@echo "Installing in ${INSTALL_PATH}"
 	unzip -d ${INSTALL_PATH} ${CONTRIBUTION}.tds.zip
 	@echo "Note, the TDS tree has to be set as well and `update-texmf`\
-	 has to be consulted afterwards."
+	 has to be consulted afterward."
 
 uninstall:
 #	don't remove everything
@@ -33,7 +33,6 @@ build: ${CONTRIBUTION}.pdf
 clean:
 	latexmk -c 2> /dev/null
 	rm -f lua.idx lua.ilg lua.ind
-	rm -f pkgopts.idx pkgopts.ilg pkgopts.ind
 
 clean-all: clean
 	rm -f ${FILE}
@@ -43,9 +42,8 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.tex
 	@echo "Creating documentation PDF"
 	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
 	makeindex -s gind.ist ${CONTRIBUTION}.idx 2> /dev/null
-	makeindex -s gind.ist lua.idx 2> /dev/null
-	makeindex -s gind.ist pkgopts.idx 2> /dev/null
-	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo 2> /dev/null
+#	makeindex -s gind.ist lua.idx 2> /dev/null
+#	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo 2> /dev/null
 	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
 
 ${FILE}: ${CONTRIBUTION}.pdf

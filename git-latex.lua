@@ -1,5 +1,3 @@
--- TODO: Expose simple macro's using token.set_macro (10.6.4)
--- TODO: always return tuple result, error
 
 if not modules then
     modules = {}
@@ -161,7 +159,11 @@ function api:dir(path)
 end
 
 function api:version()
-    local version, err = self.cmd:exec('describe --tags --always', true)
+    return self.cmd:exec('describe --tags --always', true)
+end
+
+function api:write_version()
+    local version, err = self:version()
     if version then
         tex.write(version)
     else
@@ -172,15 +174,16 @@ end
 -- todo: prevent output to stderr
 function api:is_dirty()
     local ok, _ = self.cmd:exec('describe --tags --exact-match')
-    if ok then
-        tex.write('false')
-    else
-        tex.write('true')
-    end
+    return ok == nil
 end
+-- todo: add write variant
 
 function api:local_author()
-    local name, err = self.cmd:exec('config user.name', true)
+    return self.cmd:exec('config user.name', true)
+end
+
+function api:write_local_author()
+    local name, err = self:local_author()
     if name then
         tex.write(name)
     else
@@ -189,7 +192,11 @@ function api:local_author()
 end
 
 function api:local_email()
-    local name, err = self.cmd:exec('config user.email', true)
+    return self.cmd:exec('config user.email', true)
+end
+
+function api:write_local_email()
+    local name, err = self:local_email()
     if name then
         tex.write(name)
     else
@@ -197,19 +204,36 @@ function api:local_email()
     end
 end
 
-function api:for_authors(csname, conjunction, sort_by_contrib)
+function api:authors(sort_by_contrib)
+    local authors, err = self.cmd:shortlog(sort_by_contrib, true)
+    if authors then
+        local author_list = {}
+        for line in authors:gmatch('(.-)\n') do
+            local contributions, name, email = line:match("^%s-(%d+)%s-(.-)%s-<(.-)>%s-$")
+            table.insert(author_list, {
+                contributions = contributions,
+                name = name,
+                email = email
+            })
+        end
+        return author_list
+    else
+        return nil, err
+    end
+end
+
+function api:cs_for_authors(csname, conjunction, sort_by_contrib)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local authors, err = self.cmd:shortlog(sort_by_contrib, true)
+        local authors, err = self:authors(sort_by_contrib)
         if authors then
             local next_conj
-            for line in authors:gmatch('(.-)\n') do
+            for _, author in ipairs(authors) do
                 if next_conj then
                     tex.print(next_conj)
                 end
                 next_conj = conjunction
-                local author, email = line:match("^%s-%d+%s-(.-)%s-<(.-)>%s-$")
-                tex.print(tok, '{' .. self:escape_str(self.trim(author)) .. '}', '{' .. self:escape_str(self.trim(email)) .. '}')
+                tex.print(tok, '{' .. self:escape_str(self.trim(author.name)) .. '}', '{' .. self:escape_str(self.trim(author.email)) .. '}')
             end
         else
             tex.error(err)
@@ -219,7 +243,7 @@ function api:for_authors(csname, conjunction, sort_by_contrib)
     end
 end
 
-function api:commit(csname, rev, format)
+function api:cs_commit(csname, rev, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
         local log, err = self.cmd:log(format, rev, {'max-count=1'})
@@ -240,18 +264,18 @@ function api:commit(csname, rev, format)
     end
 end
 
-function api:first_commit()
+function api:first_revision()
     return self.cmd:exec('git rev-list --max-parents=0 HEAD', true)
 end
 
-function api:last_commit(csname, format)
-    return self:commit(csname, '-1', format)
+function api:cs_last_commit(csname, format)
+    return self:cs_commit(csname, '-1', format)
 end
 
-function api:for_commit(csname, revspec, format)
+function api:cs_for_commit(csname, rev_spec, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local log, err = self.cmd:log(format, revspec)
+        local log, err = self.cmd:log(format, rev_spec)
         for _, commit in ipairs(log) do
             tex.print(tok)
             for _, value in ipairs(commit) do
@@ -275,11 +299,12 @@ end
 api.for_tag = for_tag
 --mk_action('for_tag', for_tag, true)
 
+-- formatting one tag with --count=1 (to be tested)
 mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commits)
     local sequence = {}
     local tags_result = for_tag(csname_tag)
-    local first_commit = cmds:first_commit()
-    local tag_list = cmds.tag_list() .. first_commit
+    local first_revision = cmds:first_revision()
+    local tag_list = cmds.tag_list() .. first_revision
     for version_tag in tag_list:gmatch("(.-)\n") do
         table.insert(sequence, version_tag)
     end
@@ -291,13 +316,13 @@ mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commit
         end
         -- Appending commits
         local revspec = cur_rev .. '...' .. sequence[i]
-        local commits = for_commit(csname_commit, revspec)
+        local commits = first_revision(csname_commit, revspec)
         for commit_line in commits:gmatch('\\[^{}]-{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}') do
             tex.print(commit_line)
         end
         -- Add the very last commit
         if i == #sequence then
-            local last = commit(csname_commit, first_commit)
+            local last = commit(csname_commit, first_revision)
             tex.print(last)
         end
         -- After every batch of commits

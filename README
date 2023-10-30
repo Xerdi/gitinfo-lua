@@ -37,9 +37,8 @@ The documentation can be built using `make` or manually using `lualatex`:
 ```bash
 lualatex -shell-escape git-latex.tex
 makeindex -s gind.ist git-latex.idx
-makeindex -s gind.ist lua.idx
-makeindex -s gind.ist pkgopts.idx
-makeindex -s gglo.ist -o git-latex.gls git-latex.glo
+# future work
+#makeindex -s gind.ist lua.idx
 lualatex -shell-escape git-latex.tex
 ```
 

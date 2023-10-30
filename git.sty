@@ -25,7 +25,7 @@
     append author emails/.is if=git@appendemail,
     append author emails=false,
     sort author by alphabet/.is if=git@sortalpha,
-    sort author by alphabet=false,
+    sort author by alphabet=true,
     alpha/.style={sort author by alphabet=true},
     contrib/.style={sort author by alphabet=false},
     email/.style={append author emails=true},
@@ -38,10 +38,10 @@
 
 \newcommand*\git@single@arg[1]{#1}
 
-\newcommand*\gitversion{\directlua{git:version()}}
-\newcommand*\gitauthor{\directlua{git:local_author()}}
-\newcommand*\gitemail{\directlua{git:local_email()}}
-\newcommand*\gitdate{\directlua{git:last_commit('git@single@arg', 'cs')}}
+\newcommand*\gitversion{\directlua{git:write_version()}}
+\newcommand*\gitauthor{\directlua{git:write_local_author()}}
+\newcommand*\gitemail{\directlua{git:write_local_email()}}
+\newcommand*\gitdate{\directlua{git:cs_last_commit('git@single@arg', 'cs')}}
 \newcommand*\gitdirectory[1]{\directlua{git:dir('#1')}}
 \newcommand*\gitunsetdirectory{\directlua{git:dir(nil)}}
 
@@ -54,13 +54,16 @@
     \fi%
 }
 
+\def\myfalse{false}
+\def\mytrue{true}
+
 \newcommand*\dogitauthors[1] % conjunction
 [,~]
 {%
 \ifgit@sortalpha%
-\directlua{git:for_authors('git@format@author', '#1', false)}%
+\directlua{git:cs_for_authors('git@format@author', '#1', \myfalse)}%
 \else%
-\directlua{git:for_authors('git@format@author', '#1', true)}%
+\directlua{git:cs_for_authors('git@format@author', '#1', \mytrue)}%
 \fi%
 }
 
@@ -68,14 +71,14 @@
 [\authorconjunction]
 {%
 \ifgit@sortalpha%
-\directlua{git:for_authors('#2', '#1', false)}%
+\directlua{git:cs_for_authors('#2', '#1', false)}%
 \else%
-\directlua{git:for_authors('#2', '#1', true)}%
+\directlua{git:cs_for_authors('#2', '#1', true)}%
 \fi%
 }
 
-\newcommand{\gitcommit}[3][h,an,ae,as,s,b]{\directlua{git:commit('#2', '#3', '#1')}}
-\newcommand{\forgitcommit}[3][h,an,ae,as,s,b]{\directlua{git:for_commit('#2', '#3', '#1')}}
+\newcommand{\gitcommit}[3][h,an,ae,as,s,b]{\directlua{git:cs_commit('#2', '#3', '#1')}}
+\newcommand{\forgitcommit}[3][h,an,ae,as,s,b]{\directlua{git:cs_for_commit('#2', '#3', '#1')}}
 
 
 \ifgit@setmacros
