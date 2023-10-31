@@ -6,7 +6,9 @@ A LaTeX package which provides macro's integrated with LuaTeX and the commandlin
 In order to install this package the 'TDS' tree has to be copied to a directory LaTeX will search in.
 Consult `tlmgr conf texmf TEXMFHOME` to get any ideas of where that should be.
 
-In order to get the TDS tree of git-latex run `make prepare`.
+In order to get the TDS tree of `git-latex`'s source run `make prepare`.
+This target uses package `ctanify`, which is a perl module.
+Make sure to have the Perl module `libfile-copy-recursive-perl`.
 Afterward it can be installed with:
 ```bash
 # Default installing in /usr/local/share
@@ -37,8 +39,6 @@ The documentation can be built using `make` or manually using `lualatex`:
 ```bash
 lualatex -shell-escape git-latex.tex
 makeindex -s gind.ist git-latex.idx
-# future work
-#makeindex -s gind.ist lua.idx
 lualatex -shell-escape git-latex.tex
 ```
 
