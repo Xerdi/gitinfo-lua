@@ -12,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v1
     - name: Build git-latex.tex
-      uses: dante-ev/latex-action@latest
+      uses: vinay0410/tectonic-action@master
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        root_file: git-latex
-        compiler: lualatex
-        args: -interaction=nonstopmode -shell-escape
+        tex_path: git-latex.tex
