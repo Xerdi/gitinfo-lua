@@ -53,9 +53,9 @@ bob
 
 curl https://raw.githubusercontent.com/github/gitignore/main/TeX.gitignore > .gitignore
 git add .gitignore
-git commit -m "Add gitignore" --date="2017-08-05 12:03"
+git commit -m "Add gitignore" --date="2017-08-06 12:03"
 
 charlie
 
-export GIT_COMMITTER_DATE="2017-08-05 08:41"
+export GIT_COMMITTER_DATE="2017-08-06 08:41"
 git tag -a 0.1.0 -m "Version 0.1.0"
