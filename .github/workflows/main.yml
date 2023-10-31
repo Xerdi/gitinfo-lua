@@ -17,4 +17,5 @@ jobs:
       uses: dante-ev/latex-action@latest
       with:
         root_file: git-latex
-        args: -lualatex -shell-escape
+        compiler: lualatex
+        args: -interaction=nonstopmode -shell-escape
