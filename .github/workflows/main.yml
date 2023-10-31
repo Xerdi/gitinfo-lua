@@ -13,6 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: dante-ev/latex-action@2021-A
+    - name: Build git-latex.tex
+      uses: dante-ev/latex-action@latest
       with:
         entrypoint: make
