@@ -16,5 +16,5 @@ jobs:
     - name: Build git-latex.tex
       uses: dante-ev/latex-action@latest
       with:
-        compiler: make
-        args: ''
+        root_file: git-latex
+        args: -lualatex -shell-escape
