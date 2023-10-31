@@ -60,8 +60,17 @@ function api:shortlog(sort_by_contrib, include_email, target_dir)
     return self:exec(cmd, true, target_dir)
 end
 
-function api:format_attribute(attribute, no_separator)
-    if string.find(attribute, '%w:%w') then
+function api:parse_opts(options)
+    if options then
+        for idx, opt in ipairs(options) do
+            options[idx] = '--' .. opt
+        end
+        return table.concat(options, ' ')
+    end
+end
+
+function api:format_attribute(attribute, no_separator, with_parenthesis)
+    if with_parenthesis then
         attribute = '%(' .. attribute .. ')'
     else
         attribute = '%' .. attribute
@@ -72,20 +81,20 @@ function api:format_attribute(attribute, no_separator)
     return attribute
 end
 
-function api:_parse_format_spec(spec, idx)
+function api:_parse_format_spec(spec, idx, with_parenthesis)
     local format = ''
     local above_limit = #spec + 1
-    while idx and idx < #spec do
+    while idx and idx <= #spec do
         local attr_idx, attr_size, attr = string.find(spec, '([a-z:]+)', idx)
         local if_idx, if_size, if_block, if_then, if_else = string.find(spec, '%((.-)%)%((.-)%)%((.-)%)', idx)
         if if_idx or attr_idx then
             if (if_idx or above_limit) > (attr_idx or above_limit) then
-                format = format .. self:format_attribute(attr)
+                format = format .. self:format_attribute(attr, false, with_parenthesis)
                 idx = attr_size and (attr_size + 1)
             else
-                local if_token = self:format_attribute(if_block, true)
-                local then_result = self:parse_format_spec(if_then, idx)
-                local else_result = self:parse_format_spec(if_else, idx)
+                local if_token = self:format_attribute(if_block, true, with_parenthesis)
+                local then_result = self:_parse_format_spec(if_then, idx, with_parenthesis)
+                local else_result = self:_parse_format_spec(if_else, idx, with_parenthesis)
                 format = format .. '%(if)' .. if_token .. '%(then)' .. then_result
                 format = format .. '%(else)' .. else_result .. '%(end)'
                 idx = if_size and (if_size + 1)
@@ -95,55 +104,59 @@ function api:_parse_format_spec(spec, idx)
     return format
 end
 
-function api:parse_format_spec(spec)
-    local format = self:_parse_format_spec(spec, 1)
+function api:parse_format_spec(spec, with_parenthesis)
+    if type(spec) ~= 'string' then
+        return nil, 'Pass the attribute format spec separated by "," in a string en enclosed in three parentheses for if statements'
+    end
+    local format = self:_parse_format_spec(spec, 1, with_parenthesis)
     return format .. self.record_separator
 end
 
-function api:parse_log(buffer)
+function api:parse_response(buffer)
     local results = {}
     for record_buffer in string.gmatch(buffer, '(.-)' .. self.record_separator) do
         local record = {}
         for attr in string.gmatch(record_buffer, '(.-)' .. self.attribute_separator) do
-            table.insert(record, attr)
+            table.insert(record, self.trim(attr))
         end
         table.insert(results, record)
     end
     return results
 end
 
-function api:log(format_spec, revision, options, git_dir)
-    if type(format_spec) ~= 'string' then
-        return nil, 'Pass the attribute format spec separated by "," in a string en enclosed in three parentheses for if statements'
+function api:log(format_spec, revision, options, target_dir)
+    local format, err = self:parse_format_spec(format_spec)
+    if err then
+        return nil, err
     end
-    local format = self:parse_format_spec(format_spec)
     local cmd = 'log --pretty=format:"' .. format .. '"'
-    if options then
-        for idx, opt in ipairs(options) do
-            options[idx] = '--' .. opt
-        end
-        cmd = cmd .. ' ' .. table.concat(options, ' ')
+    local opts = self:parse_opts(options)
+    if opts then
+        cmd = cmd .. ' ' .. opts
     end
     if revision and revision ~= '' then
         cmd = cmd .. ' ' .. revision
     end
-    local cmd_response, err = self:exec(cmd, true, git_dir)
-    if not cmd_response then
-        return cmd_response, err
+    local response, err = self:exec(cmd, true, target_dir)
+    if not response then
+        return nil, err
     end
-    return self:parse_log(cmd_response)
+    return self:parse_response(response)
 end
 
-function api:parse_for_each_ref(result, attrs)
-    local _, comma_count = string.gsub(attrs, ',', '')
-    local parse_string = string.rep('(.-)' .. self.attribute_separator, comma_count + 1) .. self.record_separator
-    return string.gmatch(result, parse_string .. '%s-')
-end
-
-function api:for_each_ref(format, revision_type, options, git_dir)
-    if not format or type(format) then end -- find out splitting characters
-    local cmd = 'for-each-ref --pretty=format:"' .. format '"'
-
+function api:for_each_ref(format_spec, revision_type, options, target_dir)
+    local err, format, response
+    format, err = self:parse_format_spec(format_spec, true)
+    if err then return nil, err end
+    local cmd = 'for-each-ref --format="' .. format .. '"'
+    local opts = self:parse_opts(options)
+    if opts then
+        cmd = cmd .. ' ' .. opts
+    end
+    cmd = cmd .. ' ' .. revision_type
+    response, err = self:exec(cmd, true, target_dir)
+    if err then return nil, err end
+    return self:parse_response(response)
 end
 
 local git_cmd = {}

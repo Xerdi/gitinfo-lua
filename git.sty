@@ -77,9 +77,16 @@
 \fi%
 }
 
+\def\git@default@tag@format{refname:short,(taggername)(taggername,taggeremail,taggerdate:short)(authorname,authoremail,authordate:short),subject,body}
 \newcommand{\gitcommit}[3][h,an,ae,as,s,b]{\directlua{git:cs_commit('#2', '#3', '#1')}}
 \newcommand{\forgitcommit}[3][h,an,ae,as,s,b]{\directlua{git:cs_for_commit('#2', '#3', '#1')}}
-
+\newcommand{\gittag}[3][\git@default@tag@format]{%
+    \directlua{git:cs_tag('#2', '#1', '#3')}%
+}
+\newcommand{\forgittag}[2][\git@default@tag@format]{%
+    \directlua{git:cs_for_tag('#2', '#1')}%
+}
+\newcommand{\forgittagseq}[1]{\directlua{git:cs_for_tag_sequence('#1')}}
 
 \ifgit@setmacros
     \ifgit@multipleauthors

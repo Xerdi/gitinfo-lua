@@ -38,53 +38,9 @@ local mt = {
 local git_latex = {}
 setmetatable(git_latex, mt)
 
-local cache = {}
-local cmds = {}
-local directory
-
-local function trim(s) -- deprecated
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
 function api.trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
-
-local function cmdline(cmd)
-    -- deprecated
-    local _cmd = string.gsub(cmd, 'git ', '')
-    return api.cmd:exec(_cmd)
-end
-
-local function mk_action(name, func, output)
-    local function _call_action(...)
-        if output then
-            tex.sprint(trim(func(...)))
-        else
-            func(...)
-        end
-    end
-    api[name] = _call_action
-end
-local function register_cached_command(name, command)
-    if not cache[command] then
-        local function _call_cached_command()
-            cache[command] = cache[command] or cmdline(command)
-            return cache[command]
-        end
-        cmds[name] = _call_cached_command
-    end
-end
-local function register_command_action(action, command)
-    register_cached_command(action, command)
-    mk_action(action, cmds[action], true)
-end
-
--- Changelog actions
-register_command_action('tag_list', 'git tag -l --sort=-v:refname')
-register_cached_command('for_tag', 'git for-each-ref --format="{%(refname:short)}{%(taggername)}{%(taggeremail)}{%(taggerdate:short)}{%(subject)}{%(body)}" --sort=-committerdate refs/tags')
-register_cached_command('for_commit', 'git log --no-merges --pretty=format:"{%h}{%an}{%ae}{%as}{%s}{%b}"')
-register_cached_command('for_commit_tag', 'git for-each-ref --format="{%(refname:short)}{%(authorname)}{%(authoremail)}{%(authordate:shot)}" --sort=-committerdate refs/tags')
 
 function api:set_date()
     local date, err = self.cmd:log('cs', '-1', {'max-count=1'})
@@ -106,6 +62,7 @@ function api:escape_str(value)
     return buf
 end
 
+-- experimental
 function api:get_tok()
     if self.cur_tok == nil then
         self.cur_tok = token.get_next()
@@ -113,6 +70,7 @@ function api:get_tok()
     return self.cur_tok
 end
 
+-- experimental
 function api:parse_opts()
     local tok = self:get_tok()
     if tok.cmdname == 'other_char' then
@@ -124,6 +82,7 @@ function api:parse_opts()
     end
 end
 
+-- experimental
 function api:parse_arguments(argc)
     local result_list = {}
     for _ = 1, argc do
@@ -140,6 +99,7 @@ function api:parse_arguments(argc)
     return table.unpack(result_list)
 end
 
+-- experimental
 function api:parse_macro()
     --tex.print('\\noexpand')
     local tok = self:get_tok()
@@ -147,11 +107,9 @@ function api:parse_macro()
         self.cur_tok = nil
         return tok
     else
-        print(tok.cmdname)
         tex.error("Expected Macro")
         for i = 1, 5 do
             local _tok = token.get_next()
-            print('token', i, _tok.cmdname)
         end
     end
 end
@@ -174,11 +132,12 @@ function api:write_version()
 end
 
 -- todo: prevent output to stderr
+-- todo: add write variant
+-- experimental
 function api:is_dirty()
     local ok, _ = self.cmd:exec('describe --tags --exact-match')
     return ok == nil
 end
--- todo: add write variant
 
 function api:local_author()
     return self.cmd:exec('config user.name', true)
@@ -267,7 +226,7 @@ function api:cs_commit(csname, rev, format)
 end
 
 function api:first_revision()
-    return self.cmd:exec('git rev-list --max-parents=0 HEAD', true)
+    return self.cmd:exec('rev-list --max-parents=0 HEAD', true)
 end
 
 function api:cs_last_commit(csname, format)
@@ -278,61 +237,107 @@ function api:cs_for_commit(csname, rev_spec, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
         local log, err = self.cmd:log(format, rev_spec)
-        for _, commit in ipairs(log) do
-            tex.print(tok)
-            for _, value in ipairs(commit) do
-                tex.print('{' .. self:escape_str(value) .. '}')
+        if log then
+            for _, commit in ipairs(log) do
+                tex.print(tok)
+                for _, value in ipairs(commit) do
+                    tex.print('{' .. self:escape_str(value) .. '}')
+                end
             end
+        else
+            tex.error('ERROR:\\' .. err)
         end
     else
         tex.error('ERROR: \\' .. csname .. ' not defined')
     end
 end
 
-local tag_format = '{%(refname:short)}%(if)%(taggername)%(then){%(taggername)}{%(taggeremail)}{%(taggerdate:short)}%(else){%(authorname)}{%(authoremail)}{%(authordate:short)}%(end){%(subject)}{%(body)}'
-
-local function for_tag(csname)
-    local name = 'tag_' .. csname
-    local cmd = 'git for-each-ref --format="\\' .. csname .. tag_format .. '" --sort=-authordate refs/tags'
-    register_cached_command(name, cmd)
-    return cmds[name]() or ''
+function api:tag_info(format_spec, tag, target_dir)
+    local err, info
+    info, err = self.cmd:for_each_ref(format_spec, 'refs/tags', {'count=1', 'contains=' .. tag}, target_dir)
+    if info and #info == 1 then
+        return info[1]
+    else
+        tex.error(err or 'Result count didn\'t match. (in tag_info)')
+    end
 end
 
-api.for_tag = for_tag
---mk_action('for_tag', for_tag, true)
+function api:tags(target_dir)
+    local tag_list = {}
+    local tags, err = self.cmd:exec('tag -l --sort=-v:refname', true, target_dir)
+    if tags then
+        for tag in tags:gmatch('(.-)\n') do
+            table.insert(tag_list, self.trim(tag))
+        end
+    else
+        return nil, err
+    end
+    return tag_list
+end
 
--- formatting one tag with --count=1 (to be tested)
-mk_action('for_tag_and_commit', function(csname_tag, csname_commit, after_commits)
-    local sequence = {}
-    local tags_result = for_tag(csname_tag)
-    local first_revision = cmds:first_revision()
-    local tag_list = cmds.tag_list() .. first_revision
-    for version_tag in tag_list:gmatch("(.-)\n") do
-        table.insert(sequence, version_tag)
+function api:tag_sequence(target_dir)
+    local tag_list, err = self:tags(target_dir)
+    if tag_list then
+        local first_rev
+        first_rev, err = self:first_revision()
+        if first_rev then
+            table.insert(tag_list, self.trim(first_rev))
+            return tag_list
+        end
     end
-    local cur_rev = sequence[1]
-    for i = 2, #sequence do
-        local match = string.match(tags_result, '\\[^{}]-{' .. cur_rev .. '}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}')
-        if match then
-            tex.print(match)
+    return nil, err
+end
+
+function api:cs_tag(csname, format_spec, tag, target_dir)
+    if token.is_defined(csname) then
+        local tok = token.create(csname)
+        local info = self:tag_info(format_spec, tag, target_dir)
+        if info then
+            tex.print(tok)
+            for _, value in ipairs(info) do
+                tex.print('{' .. self:escape_str(value) .. '}')
+            end
         end
-        -- Appending commits
-        local revspec = cur_rev .. '...' .. sequence[i]
-        local commits = first_revision(csname_commit, revspec)
-        for commit_line in commits:gmatch('\\[^{}]-{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}{[^{}]-}') do
-            tex.print(commit_line)
-        end
-        -- Add the very last commit
-        if i == #sequence then
-            local last = commit(csname_commit, first_revision)
-            tex.print(last)
-        end
-        -- After every batch of commits
-        if after_commits then
-            tex.print(after_commits)
-        end
-        cur_rev = sequence[i]
+    else
+        tex.error('ERROR:\\' .. csname .. ' not defined')
     end
-end, false)
+end
+
+function api:cs_for_tag(csname, format_spec, target_dir)
+    if token.is_defined(csname) then
+        local tok = token.create(csname)
+        local tags, err = self.cmd:for_each_ref(format_spec, 'refs/tags', {'sort=-authordate'}, target_dir)
+        if tags then
+            for _, info in ipairs(tags) do
+                tex.print(tok)
+                for _, value in ipairs(info) do
+                    tex.print('{' .. self:escape_str(value) .. '}')
+                end
+            end
+        else
+            tex.error('ERROR:\\' .. err)
+        end
+    else
+        tex.error('ERROR:\\' .. csname .. ' not defined')
+    end
+end
+
+function api:cs_for_tag_sequence(csname, target_dir)
+    if token.is_defined(csname) then
+        local tok = token.create(csname)
+        local seq, err = self:tag_sequence(target_dir)
+        if seq then
+            local cur = seq[1]
+            for i = 2, #seq do
+                tex.print(tok, '{' .. cur .. '}{' .. seq[i] .. '}')
+                cur = seq[i]
+            end
+        else
+            tex.error('ERROR:\\' .. (err or 'Unknown error'))
+        end
+    else
+        tex.error('ERROR:\\' .. csname .. ' not defined')
+    end
+end
 
 return git_latex
