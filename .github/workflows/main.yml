@@ -16,4 +16,5 @@ jobs:
     - name: Build git-latex.tex
       uses: dante-ev/latex-action@latest
       with:
-        entrypoint: make
+        compiler: make
+        args: ''
