@@ -149,12 +149,12 @@ latexmk -pvc -lualatex -shell-escape main
         \fbox{\parbox{\linewidth-2\fboxsep}{\dogitauthors[\\\\]}}
     \end{minipage}\\
 
-    This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:docs}) and is alphabetically sorted with package option \texttt{sort=alpha}.
+    This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:project}) and is alphabetically sorted with package option \texttt{sort=alpha}.
     \gitunsetdirectory
 
     \subsection{Commits}
     For this section the git project of this document is used due to the fact that there are references to revisions.
-    The test project's revisions change for every user, since they get recreated every time \texttt{test-scenario.sh} is executed (see section~\ref{sec:docs}).\\
+    The test project's revisions change for every user, since they get recreated every time \texttt{test-scenario.sh} is executed (see section~\ref{sec:project}).\\
 
     \noindent
     \DescribeMacro{\gitcommit}\oarg{format}\marg{csname}\marg{revision}\\
@@ -269,9 +269,10 @@ latexmk -pvc -lualatex -shell-escape main
     This is a robust example of getting all information, being it a lightweight- or annotated tag.\\
 
     For displaying commits in between tags, there's a \DescribeMacro{\forgittagseq}\cmd{\forgittagseq}\marg{csname}.
-    The \meta{csname} takes exactly two arguments, namely, the \meta{current} and \meta{next tag}, except for the last iteration.
-    The last iteration passes the initial commit as \meta{next tag}, so that the sequence of commits in between tags can be completed.
-    Afterward tag info get be fetched using the \DescribeMacro{\gittag}\cmd{\gittag}\oarg{format}\marg{csname}\marg{tag}.
+    The \meta{csname} takes exactly three arguments, namely, the \meta{current}, \meta{next tag} and \meta{rev spec}.
+    The last iteration gives an empty value for \meta{next tag} and the \meta{rev spec} is identical to \meta{current}.
+
+    Afterward tag info get be fetched using the \DescribeMacro{\gittag} \cmd{\gittag}\oarg{format}\marg{csname}\marg{tag}.
     This macro takes the same formatting specification as \cmd{\fotgittag}.
     Beware of using \cmd{\gittag} for the \meta{next tag} parameter in \cmd{\forgittagseq}.
 
@@ -283,55 +284,48 @@ latexmk -pvc -lualatex -shell-escape main
     \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting a changelog},label={lst:changelog}]
 \section*{Changelog}
 \newcommand{\commitline}[1]{\item #1}
-\newcommand{\formatversion}[2]{%
+\newcommand{\formatversion}[3]{%
     \item[#1]
     \gittag[(taggerdate)(taggerdate:short)(authordate:short)]{printdate}{#1}
     \begin{itemize}
-        \forgitcommit[s]{commitline}{#1...#2}
+        \forgitcommit[s]{commitline}{#3}
     \end{itemize}
 }%
 \begin{description}
     \forgittagseq{formatversion}
 \end{description}
     \end{lstlisting}
-    For displaying the tagline (see line 5) we use the existing \cmd{\printdate} macro of package \texttt{isodate}, which also takes exactly one argument
-    For every version sequence the commits in between are displayed (see line 7), where the last sequence having the initial commit as second argument plays well with the \cmd{\forgitcommit} macro and makes it possible to show the whole sequence of history.
     \noindent
     \newcommand\commitline[1]{\item #1}
-    \newcommand\formatversion[2]{%
+    \newcommand\formatversion[3]{%
         \item[#1] \gittag[(taggerdate)(taggerdate:short)(authordate:short)]{printdate}{#1}
         \begin{itemize}
-            \forgitcommit[s]{commitline}{#1...#2}
-        \end{itemize}
+            \forgitcommit[s]{commitline}{#3}
+        \end{itemize}%
     }%
     \setlength{\fboxsep}{16pt}%
     \begin{center}Results in\end{center}
 
     \noindent
     \fbox{
-        \parbox{\linewidth}{
+        \parbox{\linewidth-8pt-2\fboxsep}{
         {\bfseries\Large Changelog}
             \begin{description}
-                \forgittagseq{formatversion}
+                \forgittagseq{formatversion}%
             \end{description}
         }
-    }
+    }\\
+
+    For displaying the tagline (see line 5) we use the existing \cmd{\printdate} macro of package \texttt{isodate}, which also takes exactly one argument
+    For every version sequence the commits in between are displayed (see line 7), where the last sequence having the initial commit as second argument plays well with the \cmd{\forgitcommit} macro and makes it possible to show the whole sequence of history.
 
     \clearpage
-    \section{Installation}
-
-    \subsection{Building the Docs}\label{sec:docs}
+    \section{Project Example}\label{sec:project}
     This documentation uses an example \texttt{project} which gets created by the \texttt{git-scenario.sh} script (see listing~\ref{lst:scenario}).
     It creates some commits having dates in the past and different authors set.
     Lastly it creates a `lightweight-' and `annotated' tag.
 
-    To set up this scenario either use the \texttt{Makefile} or a bash shell directly.
-    \begin{lstlisting}[style=bash,morekeywords={make,bash}]
-# Using Bash
-bash git-scenario.sh
-# Using Make
-make scenario
-    \end{lstlisting}
+    To set up this scenario either do \texttt{make scenario} or \texttt{bash scenario.sh}.
 
     \lstinputlisting[style=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
 \end{document}

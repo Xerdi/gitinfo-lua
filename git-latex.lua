@@ -225,10 +225,6 @@ function api:cs_commit(csname, rev, format)
     end
 end
 
-function api:first_revision()
-    return self.cmd:exec('rev-list --max-parents=0 HEAD', true)
-end
-
 function api:cs_last_commit(csname, format)
     return self:cs_commit(csname, '-1', format)
 end
@@ -275,19 +271,6 @@ function api:tags(target_dir)
     return tag_list
 end
 
-function api:tag_sequence(target_dir)
-    local tag_list, err = self:tags(target_dir)
-    if tag_list then
-        local first_rev
-        first_rev, err = self:first_revision()
-        if first_rev then
-            table.insert(tag_list, self.trim(first_rev))
-            return tag_list
-        end
-    end
-    return nil, err
-end
-
 function api:cs_tag(csname, format_spec, tag, target_dir)
     if token.is_defined(csname) then
         local tok = token.create(csname)
@@ -325,12 +308,15 @@ end
 function api:cs_for_tag_sequence(csname, target_dir)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local seq, err = self:tag_sequence(target_dir)
+        local seq, err = self:tags(target_dir)
         if seq then
-            local cur = seq[1]
-            for i = 2, #seq do
-                tex.print(tok, '{' .. cur .. '}{' .. seq[i] .. '}')
-                cur = seq[i]
+            for idx, tag in ipairs(seq) do
+                if idx < #seq then
+                    local next = seq[idx + 1]
+                    tex.print(tok, '{' .. tag .. '}{' .. next .. '}{' .. tag .. '...' .. next .. '}')
+                else
+                    tex.print(tok, '{' .. tag .. '}{}{' .. tag .. '}')
+                end
             end
         else
             tex.error('ERROR:\\' .. (err or 'Unknown error'))
