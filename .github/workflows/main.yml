@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: Build git-latex.tex
-      uses: vinay0410/tectonic-action@v1.1.2
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: dante-ev/latex-action@latest
       with:
-        tex_path: git-latex/git-latex.tex
+        root_file: clean
+        args: build
+        compiler: make
