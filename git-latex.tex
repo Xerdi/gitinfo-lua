@@ -55,6 +55,7 @@
     \end{multicols}
     \clearpage
 
+
     \section{Usage}
     For the package to work one should work, and only work, with Lua\TeX{}.
     Another prerequisite is that there is an available git repository either in the working directory, or somewhere else on your machine (see section~\ref{sub:tex-basic}).
@@ -139,7 +140,9 @@ latexmk -pvc -lualatex -shell-escape main
     \end{minipage}\hfill%
     \begin{minipage}[t]{\xample}
         \noindent
-        \begin{center}Results in\end{center}
+        \begin{center}
+            Results in
+        \end{center}
 
         \noindent
         \setlength{\fboxsep}{5pt}%
@@ -148,6 +151,7 @@ latexmk -pvc -lualatex -shell-escape main
 
     This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:docs}) and is alphabetically sorted with package option \texttt{sort=alpha}.
     \gitunsetdirectory
+
     \subsection{Commits}
     For this section the git project of this document is used due to the fact that there are references to revisions.
     The test project's revisions change for every user, since they get recreated every time \texttt{test-scenario.sh} is executed (see section~\ref{sec:docs}).\\
@@ -170,7 +174,9 @@ latexmk -pvc -lualatex -shell-escape main
     \end{minipage}\hfill%
     \begin{minipage}[t]{\xample}
         \noindent
-        \begin{center}Results in\end{center}
+        \begin{center}
+            Results in
+        \end{center}
 
         \noindent
         \setlength{\fboxsep}{5pt}%
@@ -199,7 +205,9 @@ latexmk -pvc -lualatex -shell-escape main
     \end{minipage}\hfill%
     \begin{minipage}[t]{\xample}
         \noindent
-        \begin{center}Results in\end{center}
+        \begin{center}
+            Results in
+        \end{center}
 
         \noindent
         \newcommand\formatcommits[2]{\item #1\\\quad —#2}%
@@ -212,11 +220,54 @@ latexmk -pvc -lualatex -shell-escape main
             \end{itemize}
         }}
     \end{minipage}\\
+    \gitdirectory{../git-test-project}
+
+    \clearpage
     \subsection{Tags}
+    In this section the \texttt{git-test-project} is used.
+
     The tags are mostly useful for generating changelogs.
     For formatting tags, there's a \DescribeMacro{\forgittag}\cmd{\forgittag}\oarg{format}\marg{csname}.
     Again, like \cmd{\forgitcommit} it takes a format, however, this time more complex, since the formatting options differ between \texttt{git log} and \texttt{git for-each-ref}.
     For more info regarding these formatting options consult the man page of \texttt{git-for-each-ref}.
+
+    \noindent\setlength\xample{3.5cm}\setlength\xamplesep{0pt}
+    \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
+        \noindent
+        \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting tags}]
+\newcommand{\formattags}[2]{\item Version #1\\type: #2}
+
+\begin{itemize}
+    \forgittag[refname:short,objecttype]{formattags}
+\end{itemize}
+        \end{lstlisting}
+    \end{minipage}\hfill%
+    \begin{minipage}[t]{\xample}
+        \noindent
+        \begin{center}
+            Results in
+        \end{center}
+
+        \noindent
+        \newcommand\formattags[2]{\item Version #1\\type: #2}%
+        \setlength{\fboxsep}{0pt}%
+        \fbox{\parbox{\linewidth}{%
+            \begin{itemize}
+                \forgittag[refname:short,objecttype]
+                {formattags}
+            \end{itemize}
+        }}
+    \end{minipage}\\
+    This example shows that the versions used are mixed.
+    This is, of course, a horrible way to manage a project's version, though, we'll continue on with this hard objective.
+    For example, if we wish to display the author of the lightweight and annotated tag, we can do so by specifying a format using the if-then-else feature of the format specification.
+    The format would be: \texttt{(taggername)(taggername)(authorname)}.
+    Here the \texttt{taggername} will show up, or if not present, the \texttt{authorname} will be shown instead.
+
+    The default format specification is like the \cmd{\forgitcommit} format, but then again, some bit more complex:\\
+    \texttt{refname:short,(taggername)(taggername,taggeremail,taggerdate:short)\\(authorname,authoremail,authordate:short),subject,body}.
+    This is a robust example of getting all information, being it a lightweight- or annotated tag.\\
+
     For displaying commits in between tags, there's a \DescribeMacro{\forgittagseq}\cmd{\forgittagseq}\marg{csname}.
     The \meta{csname} takes exactly two arguments, namely, the \meta{current} and \meta{next tag}, except for the last iteration.
     The last iteration passes the initial commit as \meta{next tag}, so that the sequence of commits in between tags can be completed.
@@ -224,6 +275,49 @@ latexmk -pvc -lualatex -shell-escape main
     This macro takes the same formatting specification as \cmd{\fotgittag}.
     Beware of using \cmd{\gittag} for the \meta{next tag} parameter in \cmd{\forgittagseq}.
 
+    All these macro's put together are demonstrated in listing~\ref{lst:changelog} (see next page).
+    \clearpage
+    \subsection{Changelog}
+    This example demonstrates the generation of a changelog.
+    For simplicity’s sake, every tag is displayed in a \texttt{description} environment's item and within an \texttt{enumerate} environment displaying commits in between.
+    \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting a changelog},label={lst:changelog}]
+\section*{Changelog}
+\newcommand{\commitline}[1]{\item #1}
+\newcommand{\formatversion}[2]{%
+    \item[#1]
+    \gittag[(taggerdate)(taggerdate:short)(authordate:short)]{printdate}{#1}
+    \begin{itemize}
+        \forgitcommit[s]{commitline}{#1...#2}
+    \end{itemize}
+}%
+\begin{description}
+    \forgittagseq{formatversion}
+\end{description}
+    \end{lstlisting}
+    For displaying the tagline (see line 5) we use the existing \cmd{\printdate} macro of package \texttt{isodate}, which also takes exactly one argument
+    For every version sequence the commits in between are displayed (see line 7), where the last sequence having the initial commit as second argument plays well with the \cmd{\forgitcommit} macro and makes it possible to show the whole sequence of history.
+    \noindent
+    \newcommand\commitline[1]{\item #1}
+    \newcommand\formatversion[2]{%
+        \item[#1] \gittag[(taggerdate)(taggerdate:short)(authordate:short)]{printdate}{#1}
+        \begin{itemize}
+            \forgitcommit[s]{commitline}{#1...#2}
+        \end{itemize}
+    }%
+    \setlength{\fboxsep}{16pt}%
+    \begin{center}Results in\end{center}
+
+    \noindent
+    \fbox{
+        \parbox{\linewidth}{
+        {\bfseries\Large Changelog}
+            \begin{description}
+                \forgittagseq{formatversion}
+            \end{description}
+        }
+    }
+
+    \clearpage
     \section{Installation}
 
     \subsection{Building the Docs}\label{sec:docs}
