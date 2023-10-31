@@ -22,7 +22,7 @@ install: ${CONTRIBUTION}.tds.zip
 	 has to be consulted afterward."
 
 uninstall:
-#	don't remove everything
+#	todo: don't remove everything
 	rm -rf ${INSTALL_PATH}
 
 upload: ${FILE}
@@ -32,9 +32,9 @@ build: ${CONTRIBUTION}.pdf
 
 clean:
 	latexmk -c 2> /dev/null
-	rm -f lua.idx lua.ilg lua.ind
 
-clean-all: clean
+clean-all:
+	latexmk -C 2> /dev/null
 	rm -f ${FILE}
 	rm -f ${CONTRIBUTION}.tds.zip
 
@@ -42,8 +42,6 @@ ${CONTRIBUTION}.pdf: ${CONTRIBUTION}.tex
 	@echo "Creating documentation PDF"
 	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
 	makeindex -s gind.ist ${CONTRIBUTION}.idx 2> /dev/null
-#	makeindex -s gind.ist lua.idx 2> /dev/null
-#	makeindex -s gglo.ist -o ${CONTRIBUTION}.gls ${CONTRIBUTION}.glo 2> /dev/null
 	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
 
 ${FILE}: ${CONTRIBUTION}.pdf
