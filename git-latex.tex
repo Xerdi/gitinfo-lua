@@ -44,8 +44,8 @@
     \begin{abstract}
         This project aims to display git project information in PDF documents.
         It's mostly written in Lua for executing the \texttt{git} commands.
-        For \LaTeX{} it provides a set of standard macro's for displaying basic information or setting the project directory, and a set of advanced macro's for commits and tags.
-        The advanced macro's also have iterating variants in order to generate changelogs or display multiple authors.
+        For \LaTeX{} it provides a set of standard macros for displaying basic information or setting the project directory, and a set of advanced macros for commits and tags.
+        The advanced macros also have iterating variants in order to generate changelogs or display multiple authors.
     \end{abstract}
 
     \begin{multicols}{2}
@@ -98,9 +98,9 @@ latexmk -pvc -lualatex -shell-escape main
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
     If the options contain \texttt{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \texttt{alpha}.
-    Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macro's accordingly.
+    Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
 
-    \subsection{Basic Macro's}\label{sub:tex-basic}
+    \subsection{Basic macros}\label{sub:tex-basic}
     By default the main file's directory is used as git project directory.
     This directory can be manipulated with \DescribeMacro{\gitdirectory}\cmd{\gitdirectory}\marg{path}.
     This is only tested with relative paths on Linux.
@@ -276,7 +276,7 @@ latexmk -pvc -lualatex -shell-escape main
     This macro takes the same formatting specification as \cmd{\fotgittag}.
     Beware of using \cmd{\gittag} for the \meta{next tag} parameter in \cmd{\forgittagseq}.
 
-    All these macro's put together are demonstrated in listing~\ref{lst:changelog} (see next page).
+    All these macros put together are demonstrated in listing~\ref{lst:changelog} (see next page).
     \clearpage
     \subsection{Changelog}
     This example demonstrates the generation of a changelog.
