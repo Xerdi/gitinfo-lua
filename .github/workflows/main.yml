@@ -19,4 +19,4 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tex_path: git-latex.tex
+        tex_path: git-latex/git-latex.tex
