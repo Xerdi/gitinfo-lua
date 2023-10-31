@@ -7,28 +7,19 @@
 
 \RequirePackage{pgfopts}
 
-\newif\ifgit@usetags
 \newif\ifgit@multipleauthors
-\newif\ifgit@appendemail
-\newif\ifgit@sortalpha
 \newif\ifgit@setmacros
 \pgfkeys{/git/.is family,
     /git,
-    use tags/.is if=git@usetags,
-    use tags=false,
-    lastcommit/.style={use tags=false},
-    tags/.style={use tags=true},
+    author sort/.default=false,
+    author sort/.store in=\git@author@sort,
+    author sort,
+    contrib/.style = {/git/author sort=true},
+    alpha/.style = {/git/author sort=false},
     multiple authors/.is if=git@multipleauthors,
     multiple authors=false,
     author/.style={multiple authors=false},
     authors/.style={multiple authors=true},
-    append author emails/.is if=git@appendemail,
-    append author emails=false,
-    sort author by alphabet/.is if=git@sortalpha,
-    sort author by alphabet=true,
-    alpha/.style={sort author by alphabet=true},
-    contrib/.style={sort author by alphabet=false},
-    email/.style={append author emails=true},
     set title page macros/.is if=git@setmacros,
     set title page macros=false,
     titlepage/.style={set title page macros=true}
@@ -54,27 +45,12 @@
     \fi%
 }
 
-\def\myfalse{false}
-\def\mytrue{true}
-
-\newcommand*\dogitauthors[1] % conjunction
-[,~]
-{%
-\ifgit@sortalpha%
-\directlua{git:cs_for_authors('git@format@author', '#1', \myfalse)}%
-\else%
-\directlua{git:cs_for_authors('git@format@author', '#1', \mytrue)}%
-\fi%
+\newcommand*\dogitauthors[1][,~]{%
+    \directlua{git:cs_for_authors('git@format@author', '#1', \git@author@sort)}%
 }
 
-\newcommand*\forgitauthors[2] % conjunction
-[\authorconjunction]
-{%
-\ifgit@sortalpha%
-\directlua{git:cs_for_authors('#2', '#1', false)}%
-\else%
-\directlua{git:cs_for_authors('#2', '#1', true)}%
-\fi%
+\newcommand*\forgitauthors[2][\authorconjunction]{%
+    \directlua{git:cs_for_authors('#2', '#1', \git@author@sort)}%
 }
 
 \def\git@default@tag@format{refname:short,(taggername)(taggername,taggeremail,taggerdate:short)(authorname,authoremail,authordate:short),subject,body}

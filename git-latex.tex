@@ -97,7 +97,7 @@ latexmk -pvc -lualatex -shell-escape main
     \texttt{\textbraceleft git\textbraceright}\index[pkgopts]{git(.sty)}
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
-    If option is set to \texttt{sort=contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \texttt{sort=alpha}.
+    If the options contain \texttt{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \texttt{alpha}.
     Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macro's accordingly.
 
     \subsection{Basic Macro's}\label{sub:tex-basic}
@@ -149,7 +149,7 @@ latexmk -pvc -lualatex -shell-escape main
         \fbox{\parbox{\linewidth-2\fboxsep}{\dogitauthors[\\\\]}}
     \end{minipage}\\
 
-    This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:project}) and is alphabetically sorted with package option \texttt{sort=alpha}.
+    This example is generated with the history of the \texttt{git-test-project} (see section~\ref{sec:project}) and is alphabetically sorted with package option \texttt{alpha}.
     \gitunsetdirectory
 
     \subsection{Commits}
