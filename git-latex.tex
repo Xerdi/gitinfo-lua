@@ -60,9 +60,9 @@
 
     \begin{abstract}
         This project aims to display git project information in PDF documents.
-        It's mostly written in Lua for executing the \texttt{git} commands.
-        For \LaTeX{} it provides a set of standard macros for displaying basic information or setting the project directory, and a set of advanced macros for commits and tags.
-        The advanced macros also have iterating variants in order to generate changelogs or display multiple authors.
+        It's mostly written in Lua for executing the \texttt{git} commands, therefore making this package only applicable for \texttt{lualatex} with \texttt{shell escape} enabled.
+        If \texttt{lualatex} isn't working for you, you could try \href{https://ctan.org/pkg/gitinfo2}{gitinfo2} instead.
+        For \LaTeX{} it provides a set of standard macros for displaying basic information or setting the project directory, and a set of advanced macros for formatting commits and tags.
     \end{abstract}
 
     \begin{multicols}{2}
@@ -93,7 +93,7 @@ git init && git commit -am "Init"
 
     \subsection{Lua\LaTeX{}}
 
-    For generating the document with \LaTeX{} one should make use of \lstinline|lualatex|.
+    For generating the document with \LaTeX{} one must make use of \lstinline|lualatex|.
     For example, when having the main file `\texttt{main.tex}':
     \begin{lstlisting}[style=bash,frame=single,caption={Generating the document with \LaTeX{}}]
 # Generate once
