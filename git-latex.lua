@@ -27,8 +27,7 @@ local module = {
         comment = "Git LaTeX — Git integration with LaTeX",
         author = "Erik Nijenhuis",
         license = "free"
-    },
-    actions = {}
+    }
 }
 
 modules[module.name] = module.info
