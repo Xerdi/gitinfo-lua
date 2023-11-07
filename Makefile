@@ -1,5 +1,6 @@
 CONTRIBUTION = git-latex
 FILE = ${CONTRIBUTION}.tar.gz
+INSTALL_PATH?=/usr/local/share/${CONTRIBUTION}
 
 all: build clean
 
@@ -23,4 +24,4 @@ doc/${CONTRIBUTION}.pdf: doc/${CONTRIBUTION}.tex tex/$(wildcard *.sty) scripts/$
 
 ${FILE}: doc/${CONTRIBUTION}.pdf clean
 	@echo "Creating package tarball"
-	tar -czvf ${FILE} README.md LICENSE.pdf doc scripts tex
+	tar -czvf ${FILE} README.md doc scripts tex
