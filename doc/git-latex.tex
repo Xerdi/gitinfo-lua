@@ -137,7 +137,7 @@ latexmk -pvc -lualatex -shell-escape main
     The optional \meta{conj} conjunction makes it possible to even integrate it further.
     For example, when setting the authors in pdfx, the conjunction would be \texttt{[\textbackslash\textbackslash sep\textasciitilde]}, so that the authors are properly separated in the document properties\footnote{See package documentation of \texttt{pdfx}: \url{https://ctan.org/pkg/pdfx}}.
 
-    \gitdirectory{../git-test-project}%
+    \gitdirectory{../../git-test-project}%
     \setlength\xample{4.6cm-5pt}%
     \setlength\xamplesep{5pt}%
     \noindent%
@@ -231,7 +231,7 @@ latexmk -pvc -lualatex -shell-escape main
             \end{itemize}
         }}
     \end{minipage}\\
-    \gitdirectory{../git-test-project}
+    \gitdirectory{../../git-test-project}
 
     \clearpage
     \subsection{Tags}
@@ -338,5 +338,5 @@ latexmk -pvc -lualatex -shell-escape main
 
     To set up this scenario either do \texttt{make scenario} or \texttt{bash scenario.sh}.
 
-    \lstinputlisting[language=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
+    \lstinputlisting[language=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{../git-scenario.sh}
 \end{document}
