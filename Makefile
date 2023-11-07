@@ -1,53 +1,26 @@
 CONTRIBUTION = git-latex
-INSTALL_PATH?=/usr/local/share/${CONTRIBUTION}
-NAME = Erik Nijenhuis
-EMAIL = erik@xerdi.com
-DIRECTORY = /macros/latex/contrib/${CONTRIBUTION}
-LICENSE = free
-FREEVERSION = lppl
 FILE = ${CONTRIBUTION}.tar.gz
-export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE \
-	ANNOUNCE NOTES LICENSE FREEVERSION FILE
 
 all: build clean
 
 package: ${FILE}
 
-prepare: ${CONTRIBUTION}.tds.zip
-
-install: ${CONTRIBUTION}.tds.zip
-	@echo "Installing in ${INSTALL_PATH}"
-	unzip -d ${INSTALL_PATH} ${CONTRIBUTION}.tds.zip
-	@echo "Note, the TDS tree has to be set as well and `update-texmf`\
-	 has to be consulted afterward."
-
-uninstall:
-#	todo: don't remove everything
-	rm -rf ${INSTALL_PATH}
-
-upload: ${FILE}
-	@echo uploading (ctanupload -p)
-
-build: ${CONTRIBUTION}.pdf
+build: doc/${CONTRIBUTION}.pdf
 
 clean:
-	latexmk -c 2> /dev/null
+	cd doc && latexmk -c 2> /dev/null
 
 clean-all:
-	latexmk -C 2> /dev/null
+	cd doc && latexmk -C 2> /dev/null && \
 	rm -f ${FILE}
-	rm -f ${CONTRIBUTION}.tds.zip
 
-${CONTRIBUTION}.pdf: ${CONTRIBUTION}.tex
+doc/${CONTRIBUTION}.pdf: doc/${CONTRIBUTION}.tex tex/$(wildcard *.sty) scripts/$(wildcard *.lua)
 	@echo "Creating documentation PDF"
-	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
-	makeindex -s gind.ist ${CONTRIBUTION}.idx 2> /dev/null
-	lualatex -shell-escape ${CONTRIBUTION}.tex > /dev/null
+	cd doc && \
+	lualatex -shell-escape ${CONTRIBUTION} > /dev/null && \
+	makeindex -s gind.ist ${CONTRIBUTION}.idx 2> /dev/null && \
+	lualatex -shell-escape ${CONTRIBUTION} > /dev/null
 
-${FILE}: ${CONTRIBUTION}.pdf
+${FILE}: doc/${CONTRIBUTION}.pdf clean
 	@echo "Creating package tarball"
-	ctanify --pkgname=${CONTRIBUTION} git.sty git-latex.pdf git-cmd.lua git-latex.lua --tds "*.lua=scripts/git-latex/lua" > /dev/null
-
-${CONTRIBUTION}.tds.zip: ${FILE}
-	@echo "Extracting TDS zip file"
-	tar --extract --file=$^ $@
+	tar -czvf ${FILE} README.md LICENSE.pdf doc scripts tex
