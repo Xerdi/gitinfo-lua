@@ -32,16 +32,10 @@
 \def\projecturl{https://github.com/Xerdi/git-latex}
 \title{\texttt{Git} \LaTeX{} package\thanks{This document corresponds to package \texttt{git-latex} version \gitversion.}}
 
-\def\cmd{\lstinline[style=TeX]}
-\def\ifempty#1{\def\temp{#1}\ifx\temp\empty}
-\newcommand\largs[1]{{\ttfamily (}\textlangle\textit{#1}\textrangle{\ttfamily{)}}}
+\def\cmd{\lstinline[language={[LaTeX]TeX},keywordsprefix={\\}]}
 
 \usepackage{hyperref}
 \usepackage[nonewpage]{imakeidx}
-
-\newcommand\MentionLua[1]{\lstinline[language={[5.3]Lua}]{git.#1}\index[lua]{#1}}
-\newcommand\DescribeLua[2][]{\ifempty{#1}\quad\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
-\newcommand\DescribeLuaFunc[2][]{\ifempty{#1}{\ttfamily()}\else\largs{#1}\fi\marginpar{\hfill\MentionLua{#2}}}
 
 \CodelineIndex
 \EnableCrossrefs
@@ -80,7 +74,7 @@
     \subsection{Git}
     For this package to work at a minimum, there has to be an initialized Git repository, and preferably, at least with one commit.
     For example, the following minimal example should do the trick already:
-    \begin{lstlisting}[style=bash,frame=single,caption={Minimal Git setup}]
+    \begin{lstlisting}[language=bash,frame=single,caption={Minimal Git setup},morekeywords={mkdir,git}]
 mkdir my_project
 cd my_project
 echo "# My Project" > README.md
@@ -88,20 +82,20 @@ git init && git commit -am "Init"
     \end{lstlisting}
 
     Then in order for the changelog to work, the project needs to contain either `lightweight-' or `annotated' tags.
-    The main difference is that a lightweight tag takes no extra options, for example: \lstinline[style=Bash]{git tag 0.1}.
+    The main difference is that a lightweight tag takes no extra options, for example: \texttt{git tag 0.1}.
     See listing~\ref{lst:scenario} for more examples on authoring and versioning with \texttt{git}.
 
     \subsection{Lua\LaTeX{}}
 
-    For generating the document with \LaTeX{} one must make use of \lstinline|lualatex|.
+    For generating the document with \LaTeX{} one must make use of \texttt{lualatex}.
     For example, when having the main file `\texttt{main.tex}':
-    \begin{lstlisting}[style=bash,frame=single,caption={Generating the document with \LaTeX{}}]
+    \begin{lstlisting}[language=bash,frame=single,caption={Generating the document with \LaTeX{}},morekeywords={lualatex,latexmk}]
 # Generate once
 lualatex -shell-escape main
 # Generate and keep watching with LaTeXMK
 latexmk -pvc -lualatex -shell-escape main
     \end{lstlisting}
-    Note that in both cases option `-shell-escape' is required.
+    Note that in both cases option \texttt{-shell-escape} is required.
     This is required for issuing \texttt{git} via the commandline.
 
 
@@ -114,8 +108,8 @@ latexmk -pvc -lualatex -shell-escape main
     \texttt{\textbraceleft git\textbraceright}\index[pkgopts]{git(.sty)}
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
-    If the options contain \texttt{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \texttt{alpha}.
-    Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
+    If the options contain \meta{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \meta{alpha}.
+    Another option is the \meta{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
 
     \subsection{Basic macros}\label{sub:tex-basic}
     By default the main file's directory is used as git project directory.
@@ -148,7 +142,7 @@ latexmk -pvc -lualatex -shell-escape main
     \setlength\xamplesep{5pt}%
     \noindent%
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}%
-        \begin{lstlisting}[style=TeX,numbers=left,caption={Formatting authors},captionpos=t]
+        \begin{lstlisting}[language={[LaTeX]TeX},numbers=left,caption={Formatting authors},captionpos=t,morekeywords={myauthorformat,href,forgitauthors,dogitauthors}]
 \newcommand{\myauthorformat}[2]{#1 \href{mailto:#2}{#2}}
 \forgitauthors[\\]{myauthorformat}
 % Or using standard format
@@ -183,7 +177,7 @@ latexmk -pvc -lualatex -shell-escape main
     \setlength\xamplesep{0pt}%
     \noindent%
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
-        \begin{lstlisting}[style=tex,numbers=left,caption={Formatting a commit},captionpos=t]
+        \begin{lstlisting}[language={[LaTeX]TeX},numbers=left,caption={Formatting a commit},captionpos=t,morekeywords={formatcommit,printdate,gitcommit}]
 \newcommand{\formatcommit}[3]{#1, by #2 on \printdate{#3}}
 
 \gitcommit[s,an,as]{formatcommit}{75dc036}
@@ -212,7 +206,7 @@ latexmk -pvc -lualatex -shell-escape main
     \noindent\setlength\xample{4.5cm}\setlength\xamplesep{0pt}
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
         \noindent
-        \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting commits}]
+        \begin{lstlisting}[language={[LaTeX]TeX},numbers=left,captionpos=t,caption={Formatting commits},morekeywords={formatcommits,forgitcommit}]
 \newcommand{\formatcommits}[2]{\item #1\\\quad —#2}
 
 \begin{itemize}
@@ -251,7 +245,7 @@ latexmk -pvc -lualatex -shell-escape main
     \noindent\setlength\xample{3.5cm}\setlength\xamplesep{0pt}
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}
         \noindent
-        \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting tags}]
+        \begin{lstlisting}[language={[LaTeX]TeX},numbers=left,captionpos=t,caption={Formatting tags},morekeywords={formattags,forgittag}]
 \newcommand{\formattags}[2]{\item Version #1\\type: #2}
 
 \begin{itemize}
@@ -298,7 +292,7 @@ latexmk -pvc -lualatex -shell-escape main
     \subsection{Changelog}
     This example demonstrates the generation of a changelog.
     For simplicity’s sake, every tag is displayed in a \texttt{description} environment's item and within an \texttt{enumerate} environment displaying commits in between.
-    \begin{lstlisting}[style=TeX,numbers=left,captionpos=t,caption={Formatting a changelog},label={lst:changelog}]
+    \begin{lstlisting}[language={[LaTeX]TeX},numbers=left,captionpos=t,caption={Formatting a changelog},label={lst:changelog},morekeywords={commitline,formatversion,gittag,forgitcommit,forgittagseq,printdate}]
 \section*{Changelog}
 \newcommand{\commitline}[1]{\item #1}
 \newcommand{\formatversion}[3]{%
@@ -344,5 +338,5 @@ latexmk -pvc -lualatex -shell-escape main
 
     To set up this scenario either do \texttt{make scenario} or \texttt{bash scenario.sh}.
 
-    \lstinputlisting[style=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
+    \lstinputlisting[language=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
 \end{document}
