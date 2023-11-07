@@ -43,3 +43,7 @@ lualatex -shell-escape git-latex.tex
 ```
 
 Read [git-latex.pdf](git-latex.pdf) for more information about this package.
+
+## License
+This project is licensed under the LPPL version 1.3c and maintained by Erik Nijenhuis.
+See [LICENSE.pdf](LICENSE.pdf) for more information.
