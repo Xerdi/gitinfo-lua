@@ -30,7 +30,7 @@
 \usepackage[orig,english]{isodate}
 
 \def\projecturl{https://github.com/Xerdi/git-latex}
-\title{\texttt{Git} \LaTeX{} package\thanks{This document corresponds to package \texttt{git-latex} version \gitversion.}}
+\title{\texttt{Git} \LaTeX{} package\thanks{This document corresponds to package \texttt{git-latex} version \gitversion written on \gitdate.}}
 
 \def\cmd{\lstinline[language={[LaTeX]TeX},keywordsprefix={\\}]}
 
@@ -194,7 +194,7 @@ latexmk -pvc -lualatex -shell-escape main
         \newcommand\formatcommit[3]{#1, by #2 on \printdate{#3}}%
         \fbox{\parbox{\linewidth-2\fboxsep}{\gitcommit[s,an,as]{formatcommit}{75dc036}\footnotemark}}
     \end{minipage}\\
-    \footnotetext{\texttt{\textbackslash printdate} from \texttt{isodate}: \url{https://www.ctan.org/pkg/isodate}}
+    \footnotetext{\cs{printdate} from \texttt{isodate}: \url{https://www.ctan.org/pkg/isodate}}
 
     Consult \texttt{man git-log} for possible format variables and omit the \% for every variable.\\
 
