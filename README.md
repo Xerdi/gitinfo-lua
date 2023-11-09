@@ -37,6 +37,9 @@ It can be validated by the output of: `kpsewhich -var-value TEXMFAUXTREES`.
 ## Documentation
 The documentation can be built using `make` or manually using `lualatex`:
 ```bash
+make build
+# Or manually
+cd doc
 lualatex -shell-escape git-latex.tex
 makeindex -s gind.ist git-latex.idx
 lualatex -shell-escape git-latex.tex
