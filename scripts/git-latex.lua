@@ -135,7 +135,7 @@ function api:dir(path)
 end
 
 function api:version()
-    return self.cmd:exec('describe --tags --always', true)
+    return self.trim(self.cmd:exec('describe --tags --always', true))
 end
 
 function api:write_version()
@@ -156,7 +156,7 @@ function api:is_dirty()
 end
 
 function api:local_author()
-    return self.cmd:exec('config user.name', true)
+    return self.trim(self.cmd:exec('config user.name', true))
 end
 
 function api:write_local_author()
@@ -169,7 +169,7 @@ function api:write_local_author()
 end
 
 function api:local_email()
-    return self.cmd:exec('config user.email', true)
+    return self.trim(self.cmd:exec('config user.email', true))
 end
 
 function api:write_local_email()
