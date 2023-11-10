@@ -1,4 +1,4 @@
-%% git.sty
+%% gitinfo-lua.sty
 %% Copyright 2023 E. Nijenhuis
 %
 % This work may be distributed and/or modified under the
@@ -13,21 +13,21 @@
 %
 % The Current Maintainer of this work is E. Nijenhuis.
 %
-% This work consists of the files git.sty git-latex.pdf git-cmd.lua
-% and git-latex.lua
+% This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
+% gitinfo-cmd.lua and gitinfo-lua.lua
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{git}[2023/11/09 Xerdi's Git Package]
+\ProvidesPackage{gitinfo-lua}[2023/11/10 Xerdi's Git Package]
 
 \RequirePackage{luacode}
 
-\directlua{git = require('git-latex')}
+\directlua{git = require('gitinfo-lua')}
 
 \RequirePackage{pgfopts}
 
 \newif\ifgit@multipleauthors
 \newif\ifgit@setmacros
-\pgfkeys{/git/.is family,
-    /git,
+\pgfkeys{/gitinfo-lua/.is family,
+    /gitinfo-lua,
     author sort/.default=false,
     author sort/.store in=\git@author@sort,
     author sort,

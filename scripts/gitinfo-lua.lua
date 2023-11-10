@@ -1,4 +1,4 @@
--- git-latex.lua
+-- gitinfo-lua.lua
 -- Copyright 2023 E. Nijenhuis
 --
 -- This work may be distributed and/or modified under the
@@ -13,18 +13,18 @@
 --
 -- The Current Maintainer of this work is E. Nijenhuis.
 --
--- This work consists of the files git.sty git-latex.pdf git-cmd.lua
--- and git-latex.lua
+-- This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
+-- gitinfo-cmd.lua and gitinfo-lua.lua
 
 if not modules then
     modules = {}
 end
 
 local module = {
-    name = 'git-latex',
+    name = 'gitinfo-lua',
     info = {
         version = 0.001,
-        comment = "Git LaTeX — Git integration with LaTeX",
+        comment = "Git info Lua — Git integration with LaTeX",
         author = "Erik Nijenhuis",
         license = "free"
     }
@@ -34,7 +34,7 @@ modules[module.name] = module.info
 
 local api = {
     cur_tok = nil,
-    cmd = require('git-cmd'),
+    cmd = require('gitinfo-lua-cmd'),
     escape_chars = {
         ['&'] = '\\&',
         ['%%'] = '\\%%',
@@ -51,8 +51,8 @@ local mt = {
     __index = api,
     __newindex = nil
 }
-local git_latex = {}
-setmetatable(git_latex, mt)
+local gitinfo = {}
+setmetatable(gitinfo, mt)
 
 function api.trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -342,4 +342,4 @@ function api:cs_for_tag_sequence(csname, target_dir)
     end
 end
 
-return git_latex
+return gitinfo

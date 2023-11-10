@@ -1,4 +1,4 @@
-%% git-latex.tex
+%% gitinfo-lua.tex
 %% Copyright 2023 E. Nijenhuis
 %
 % This work may be distributed and/or modified under the
@@ -13,11 +13,11 @@
 %
 % The Current Maintainer of this work is E. Nijenhuis.
 %
-% This work consists of the files git.sty git-latex.pdf git-cmd.lua
-% and git-latex.lua
+% This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
+% gitinfo-cmd.lua and gitinfo-lua.lua
 \documentclass{ltxdoc}
 \usepackage[english]{babel}
-\usepackage[titlepage]{git}
+\usepackage[titlepage]{gitinfo-lua}
 
 \usepackage{listings}
 
@@ -29,8 +29,8 @@
 
 \usepackage[orig,english]{isodate}
 
-\def\projecturl{https://github.com/Xerdi/git-latex}
-\title{\texttt{Git} \LaTeX{} package\thanks{This document corresponds to package \texttt{git-latex} version \gitversion written on \gitdate.}}
+\def\projecturl{https://github.com/Xerdi/gitinfo-lua}
+\title{\textbf{Gitinfo Lua} package\thanks{This document corresponds to package \texttt{gitinfo-lua} version \gitversion written on \gitdate.}}
 
 \def\cmd{\lstinline[language={[LaTeX]TeX},keywordsprefix={\\}]}
 
@@ -105,7 +105,7 @@ latexmk -pvc -lualatex -shell-escape main
 
     \cmd{\usepackage}%
     \oarg{opts...}%
-    \texttt{\textbraceleft git\textbraceright}\index[pkgopts]{git(.sty)}
+    \texttt{\textbraceleft gitinfo-lua\textbraceright}\index[pkgopts]{gitinfo-lua(.sty)}
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
     If the options contain \meta{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \meta{alpha}.
@@ -338,5 +338,5 @@ latexmk -pvc -lualatex -shell-escape main
 
     To set up this scenario either do \texttt{make scenario} or \texttt{bash scenario.sh}.
 
-    \lstinputlisting[language=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{../git-scenario.sh}
+    \lstinputlisting[language=bash,numbers=left,frame=single,label={lst:scenario},caption={git-scenario.sh},captionpos=t,morekeywords={git,alice,bob,charlie,mkdir,rm,curl,set\_author}]{git-scenario.sh}
 \end{document}

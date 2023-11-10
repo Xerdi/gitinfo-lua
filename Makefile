@@ -1,4 +1,4 @@
-CONTRIBUTION = git-latex
+CONTRIBUTION = gitinfo-lua
 FILE = ${CONTRIBUTION}.tar.gz
 INSTALL_PATH?=/usr/local/share/${CONTRIBUTION}
 

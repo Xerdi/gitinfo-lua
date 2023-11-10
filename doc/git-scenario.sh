@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_DIR="${1:-../git-test-project}"
+PROJECT_DIR="${1:-../../git-test-project}"
 
 set_author() {
   git config user.name $1

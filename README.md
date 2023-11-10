@@ -6,7 +6,7 @@ A LaTeX package which provides macros integrated with LuaTeX and the commandline
 In order to install this package the 'TDS' tree has to be copied to a directory LaTeX will search in.
 Consult `tlmgr conf texmf TEXMFHOME` to get any ideas of where that should be.
 
-In order to get the TDS tree of `git-latex`'s source run `make prepare`.
+In order to get the TDS tree of `gitinfo-lua`'s source run `make prepare`.
 This target uses package `ctanify`, which is a perl module.
 Make sure to have the Perl module `libfile-copy-recursive-perl`.
 Afterward it can be installed with:
@@ -27,7 +27,7 @@ For adding a TDS directory manually consult the documentation of TDS.
 For Debian systems it's pretty straightforward.
 One can easily add a configuration file which sets the `TEXMFAUXTREES` in `/etc/texmf/texmf.d`.
 ```bash
-TEXMFAUXTREES=/usr/local/share/git-latex,
+TEXMFAUXTREES=/usr/local/share/gitinfo-lua,
 ```
 */etc/texmf/texmf.d/01xerdi.cnf*
 
@@ -40,12 +40,12 @@ The documentation can be built using `make` or manually using `lualatex`:
 make build
 # Or manually
 cd doc
-lualatex -shell-escape git-latex.tex
-makeindex -s gind.ist git-latex.idx
-lualatex -shell-escape git-latex.tex
+lualatex -shell-escape gitinfo-lua.tex
+makeindex -s gind.ist gitinfo-lua.idx
+lualatex -shell-escape gitinfo-lua.tex
 ```
 
-Read [git-latex.pdf](git-latex.pdf) for more information about this package.
+Read [gitinfo-lua.pdf](gitinfo-lua.pdf) for more information about this package.
 
 ## License
 This project is licensed under the LPPL version 1.3c and maintained by Erik Nijenhuis.

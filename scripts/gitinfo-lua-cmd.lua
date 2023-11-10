@@ -1,4 +1,4 @@
--- git-cmd.lua
+-- gitinfo-lua-cmd.lua
 -- Copyright 2023 E. Nijenhuis
 --
 -- This work may be distributed and/or modified under the
@@ -13,8 +13,8 @@
 --
 -- The Current Maintainer of this work is E. Nijenhuis.
 --
--- This work consists of the files git.sty git-latex.pdf git-cmd.lua
--- and git-latex.lua
+-- This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
+-- gitinfo-cmd.lua and gitinfo-lua.lua
 
 local api = {
     cwd = nil,
@@ -175,12 +175,12 @@ function api:for_each_ref(format_spec, revision_type, options, target_dir)
     return self:parse_response(response)
 end
 
-local git_cmd = {}
-local git_cmd_mt = {
+local gitinfo_cmd = {}
+local gitinfo_cmd_mt = {
     __index = api,
     __newindex = nil
 }
 
-setmetatable(git_cmd, git_cmd_mt)
+setmetatable(gitinfo_cmd, gitinfo_cmd_mt)
 
-return git_cmd
+return gitinfo_cmd
