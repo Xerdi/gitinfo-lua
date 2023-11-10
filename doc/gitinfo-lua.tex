@@ -110,6 +110,8 @@ latexmk -pvc -lualatex -shell-escape main
     The author sorting is one of them.
     If the options contain \meta{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \meta{alpha}.
     Another option is the \meta{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
+    By default, it sets the local git author, equivalent to option \meta{author}.
+    Pass option \meta{authors} to set all git authors of the project instead.
 
     \subsection{Basic macros}\label{sub:tex-basic}
     By default the main file's directory is used as git project directory.
