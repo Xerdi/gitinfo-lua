@@ -23,7 +23,7 @@ end
 local module = {
     name = 'gitinfo-lua',
     info = {
-        version = 0.001,
+        version = 1.0,
         comment = "Git info Lua — Git integration with LaTeX",
         author = "Erik Nijenhuis",
         license = "free"
