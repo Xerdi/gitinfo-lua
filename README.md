@@ -3,41 +3,13 @@
 A LaTeX package which provides macros integrated with LuaTeX and the commandline tool `git`.
 
 ## Installation
-In order to install this package the 'TDS' tree has to be copied to a directory LaTeX will search in.
-Consult `tlmgr conf texmf TEXMFHOME` to get any ideas of where that should be.
-
-In order to get the TDS tree of `gitinfo-lua`'s source run `make prepare`.
-This target uses package `ctanify`, which is a perl module.
-Make sure to have the Perl module `libfile-copy-recursive-perl`.
-Afterward it can be installed with:
-```bash
-# Default installing in /usr/local/share
-sudo make install
-# Installing in a user directory
-export INSTALL_PATH=~/.local/share
-make install
-# Or install in an already known TDS structure
-export INSTALL_PATH=~/texmf
-make install
-```
-
-Note that when using the existing `~/texmf` directory, one should **NOT** use `make uninstall`, for that also erases your existing files in `~/texmf`.
-
-For adding a TDS directory manually consult the documentation of TDS.
-For Debian systems it's pretty straightforward.
-One can easily add a configuration file which sets the `TEXMFAUXTREES` in `/etc/texmf/texmf.d`.
-```bash
-TEXMFAUXTREES=/usr/local/share/gitinfo-lua,
-```
-*/etc/texmf/texmf.d/01xerdi.cnf*
-
-Afterward execute `update-texmf` with root permissions.
-It can be validated by the output of: `kpsewhich -var-value TEXMFAUXTREES`.
+In order to install this package the right way, one should create the release tarball first with `make package`.
+Afterward be sure to unpack the contents of the release tarball anywhere where TeX will find it, i.e. `~/texmf`.
 
 ## Documentation
 The documentation can be built using `make` or manually using `lualatex`:
 ```bash
-make build
+make build clean
 # Or manually
 cd doc
 lualatex -shell-escape gitinfo-lua.tex
