@@ -55,7 +55,7 @@ local gitinfo = {}
 setmetatable(gitinfo, mt)
 
 function api.trim(s)
-    return (s:gsub("^%s*(.-)%s*$", "%1"))
+    return s and (s:gsub("^%s*(.-)%s*$", "%1")) or 'nil'
 end
 
 function api:set_date()
