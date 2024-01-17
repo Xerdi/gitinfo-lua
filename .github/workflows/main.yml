@@ -1,3 +1,5 @@
+name: Gitinfo Lua CI/CD
+
 on:
   push:
     branches:
