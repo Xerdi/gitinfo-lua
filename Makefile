@@ -1,7 +1,7 @@
 CONTRIBUTION = gitinfo-lua
 FILE = ${CONTRIBUTION}.tar.gz
 MANUAL = doc/${CONTRIBUTION}
-COMPILER = lualatex --shell-escape
+COMPILER = lualatex --shell-escape --interaction=nonstopmode
 
 TEST_PROJECT ?= ../git-test-project
 
