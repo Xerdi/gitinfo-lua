@@ -19,7 +19,7 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
             image: maclotsen/xerdi-latex:ctantl
-            options: --rm -i --net=none -v "$PWD":/data
+            options: --rm -i --net=none -v ${{ github.workspace }}:/data
             run: |
                 make build
 
