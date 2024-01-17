@@ -30,10 +30,5 @@ jobs:
       - name: Upload Documentation
         uses: actions/upload-artifact@v3
         with:
-          name: gitinfo-lua.pdf
-          path: ${{ github.workspace }}/gitinfo-lua/doc/gitinfo-lua.pdf
-      - name: Upload Build
-        uses: actions/upload-artifact@v3
-        with:
           name: build
           path: ${{ github.workspace }}/gitinfo-lua/doc
