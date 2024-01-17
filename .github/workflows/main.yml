@@ -24,8 +24,7 @@ jobs:
             shell: bash
             options: --rm -i -v ${{ github.workspace }}:/data
             run: |
-                cd gitinfo-lua
-                make build
+                make -C gitinfo-lua build
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v3
