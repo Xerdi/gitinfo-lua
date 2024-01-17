@@ -23,10 +23,10 @@ end
 local module = {
     name = 'gitinfo-lua',
     info = {
-        version = '1.0.0-2-g7ab0f47', --TAGVERSION
-        date = '2024/01/05', --TAGDATE
+        version = '1.0.0-3-g980bc66', --TAGVERSION
+        date    = '2024/01/05',       --TAGDATE
         comment = "Git info Lua — Git integration with LaTeX",
-        author = "Erik Nijenhuis",
+        author  = "Erik Nijenhuis",
         license = "free"
     }
 }
@@ -60,7 +60,7 @@ function api.trim(s)
 end
 
 function api:set_date()
-    local date, err = self.cmd:log('cs', '-1', {'max-count=1'})
+    local date, err = self.cmd:log('cs', '-1', { 'max-count=1' })
     if date and #date == 1 then
         local _, _, year, month, day = date[1][1]:find('(%d+)[-/](%d+)[-/](%d+)')
         tex.year = tonumber(year)
@@ -224,7 +224,7 @@ end
 function api:cs_commit(csname, rev, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local log, err = self.cmd:log(format, rev, {'max-count=1'})
+        local log, err = self.cmd:log(format, rev, { 'max-count=1' })
         if log then
             if #log == 1 then
                 tex.print(tok)
@@ -267,7 +267,7 @@ end
 
 function api:tag_info(format_spec, tag, target_dir)
     local err, info
-    info, err = self.cmd:for_each_ref(format_spec, 'refs/tags', {'count=1', 'contains=' .. tag}, target_dir)
+    info, err = self.cmd:for_each_ref(format_spec, 'refs/tags', { 'count=1', 'contains=' .. tag }, target_dir)
     if info and #info == 1 then
         return info[1]
     else
@@ -306,7 +306,7 @@ end
 function api:cs_for_tag(csname, format_spec, target_dir)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local tags, err = self.cmd:for_each_ref(format_spec, 'refs/tags', {'sort=-authordate'}, target_dir)
+        local tags, err = self.cmd:for_each_ref(format_spec, 'refs/tags', { 'sort=-authordate' }, target_dir)
         if tags then
             for _, info in ipairs(tags) do
                 tex.print(tok)

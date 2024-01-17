@@ -1,12 +1,15 @@
 CONTRIBUTION = gitinfo-lua
 FILE = ${CONTRIBUTION}.tar.gz
-INSTALL_PATH?=/usr/local/share/${CONTRIBUTION}
+MANUAL = doc/${CONTRIBUTION}
+COMPILER = lualatex --shell-escape
+
+TEST_PROJECT = ../git-test-project
 
 all: build clean
 
 package: ${FILE}
 
-build: doc/${CONTRIBUTION}.pdf
+build: ${MANUAL}.pdf
 
 clean:
 	cd doc && latexmk -c 2> /dev/null
@@ -15,13 +18,20 @@ clean-all:
 	cd doc && latexmk -C 2> /dev/null && \
 	rm -f ${FILE}
 
-doc/${CONTRIBUTION}.pdf: doc/${CONTRIBUTION}.tex tex/$(wildcard *.sty) scripts/$(wildcard *.lua)
-	@echo "Creating documentation PDF"
-	cd doc && \
-	lualatex -shell-escape ${CONTRIBUTION} > /dev/null && \
-	makeindex -s gind.ist ${CONTRIBUTION}.idx 2> /dev/null && \
-	lualatex -shell-escape ${CONTRIBUTION} > /dev/null
+${TEST_PROJECT}: doc/git-scenario.sh
+	cd doc && ./git-scenario.sh
 
-${FILE}: doc/${CONTRIBUTION}.pdf clean
+${MANUAL}.aux: ${MANUAL}.tex
+	cd doc && $(COMPILER) ${CONTRIBUTION}
+
+${MANUAL}.idx: ${MANUAL}.aux
+	cd doc && makeindex -s gind.ist ${CONTRIBUTION}.idx
+
+${MANUAL}.pdf: ${TEST_PROJECT} ${MANUAL}.idx ${MANUAL}.tex tex/$(wildcard *.sty) scripts/$(wildcard *.lua)
+	@echo "Creating documentation PDF"
+	cd doc && $(COMPILER) ${CONTRIBUTION}
+	while grep 'Rerun to get ' doc/${CONTRIBUTION}.log ; do cd doc && $(COMPILER) ${CONTRIBUTION} ; done
+
+${FILE}: ${MANUAL}.pdf clean
 	@echo "Creating package tarball"
-	tar -czvf ${FILE} README.md doc scripts tex
+	tar --transform 's,^\.,gitinfo-lua,' -czvf ${FILE} ./README.md ./doc ./scripts ./tex
