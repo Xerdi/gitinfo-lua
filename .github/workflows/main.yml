@@ -20,7 +20,7 @@ jobs:
         with:
             image: maclotsen/xerdi-latex:ctantl
             shell: bash
-            options: --rm -i --net=none -v ${{ github.workspace }}:/data
+            options: --rm -i -v ${{ github.workspace }}:/data
             run: |
                 make build
 
