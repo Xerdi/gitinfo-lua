@@ -2,8 +2,6 @@
 
 set -e
 
-PROJECT_DIR="${1:-../../git-test-project}"
-
 set_author() {
   git config user.name $1
   git config user.email $2
@@ -22,15 +20,6 @@ bob() {
 charlie() {
   set_author 'Charlie' 'charlie@example.com'
 }
-
-if [[ -d "${PROJECT_DIR}" ]]; then
-  rm -rf "${PROJECT_DIR}"
-fi
-
-mkdir "${PROJECT_DIR}"
-cd "${PROJECT_DIR}"
-
-git init
 
 alice
 
