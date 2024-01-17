@@ -1,0 +1,30 @@
+name: Gitinfo Lua CI/CD
+
+on:
+  push:
+    branches:
+    - master
+    - autobuild
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
+        with:
+            image: maclotsen/xerdi-latex:ctantl
+            options: --rm -i --user="$(id -u):$(id -g)" --net=none -v "$PWD":/data
+            run: |
+                make build
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: workspace_artifacts
+          path: ${{ github.workspace }}
