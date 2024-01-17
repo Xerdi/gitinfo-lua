@@ -24,7 +24,7 @@ jobs:
             shell: bash
             options: --rm -i -v ${{ github.workspace }}:/data
             run: |
-                git config --global --add safe.directory ${{ github.workspace }}
+                git config --global --add safe.directory '*'
                 make -C gitinfo-lua build
 
       - name: Upload Build Artifacts
