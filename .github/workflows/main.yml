@@ -12,16 +12,16 @@ jobs:
           path: gitinfo-lua
           fetch-tags: true
           fetch-depth: 0
-      - name: Add git directories
-        run: git config --global --add safe.directory $PWD/*
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
             image: maclotsen/xerdi-latex:ctantl
             shell: bash
             options: --rm -i -v ${{ github.workspace }}:/data
-            run: make -C gitinfo-lua build
-      - name: Upload Documentation
+            run: |
+              git config --global --add safe.directory /data/gitinfo-lua
+              make -C gitinfo-lua build
+      - name: Archive Documentation
         uses: actions/upload-artifact@v3
         with:
           name: build
