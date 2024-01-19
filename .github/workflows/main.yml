@@ -1,6 +1,6 @@
 name: Gitinfo Lua CI/CD
 
-on: [ push, pull-request ]
+on: [ push, pull_request ]
 
 jobs:
   build:
