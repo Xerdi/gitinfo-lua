@@ -23,8 +23,8 @@ end
 local module = {
     name = 'gitinfo-lua',
     info = {
-        version = '1.0.0-3-g980bc66', --TAGVERSION
-        date    = '2024/01/05',       --TAGDATE
+        version = '1.0.0-5-gef0d5e2', --TAGVERSION
+        date    = '2024/01/19',       --TAGDATE
         comment = "Git info Lua — Git integration with LaTeX",
         author  = "Erik Nijenhuis",
         license = "free"
