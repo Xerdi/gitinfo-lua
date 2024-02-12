@@ -23,7 +23,7 @@ end
 local module = {
     name = 'gitinfo-lua',
     info = {
-        version = '1.0.0-29-g233f387', --TAGVERSION
+        version = '1.0.0-30-g69ba74a', --TAGVERSION
         date    = '2024/01/19',       --TAGDATE
         comment = "Git info Lua — Git integration with LaTeX",
         author  = "Erik Nijenhuis",
@@ -44,8 +44,8 @@ local api = {
         ['_'] = '\\_',
         ['{'] = '\\{',
         ['}'] = '\\}',
-        ['~'] = '\\textasciitilde',
-        ['%^'] = '\\textasciicircum'
+        ['~'] = '\\textasciitilde ',
+        ['%^'] = '\\textasciicircum '
     }
 }
 local mt = {
@@ -72,7 +72,7 @@ function api:set_date()
 end
 
 function api:escape_str(value)
-    local buf = string.gsub(value, '\\', '\\textbackslash')
+    local buf = string.gsub(value, '\\', '\\textbackslash ')
     for search, replace in pairs(self.escape_chars) do
         buf = string.gsub(buf, search, replace)
     end
