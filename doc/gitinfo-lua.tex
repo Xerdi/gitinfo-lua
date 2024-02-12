@@ -17,10 +17,15 @@
 % gitinfo-cmd.lua and gitinfo-lua.lua
 \documentclass{ltxdoc}
 \usepackage[english]{babel}
-\usepackage[titlepage]{gitinfo-lua}
+\usepackage[titlepage,authors]{../tex/gitinfo-lua}
 
 \usepackage{listings}
-
+\lstset{
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    breaklines=true,
+    breakatwhitespace=false
+}
 \usepackage{calc}
 \usepackage{multicol}
 \usepackage{tabularx}
@@ -285,7 +290,7 @@ latexmk -pvc -lualatex -shell-escape main
     The \meta{csname} takes exactly three arguments, namely, the \meta{current}, \meta{next tag} and \meta{rev spec}.
     The last iteration gives an empty value for \meta{next tag} and the \meta{rev spec} is identical to \meta{current}.
 
-    Afterward tag info get be fetched using the \DescribeMacro{\gittag} \cmd{\gittag}\oarg{format}\marg{csname}\marg{tag}.
+    Afterward tag info can be fetched using the \DescribeMacro{\gittag} \cmd{\gittag}\oarg{format}\marg{csname}\marg{tag}.
     This macro takes the same formatting specification as \cmd{\fotgittag}.
     Beware of using \cmd{\gittag} for the \meta{next tag} parameter in \cmd{\forgittagseq}.
 
