@@ -24,6 +24,8 @@ jobs:
             shell: bash
             options: --rm -i -v ${{ github.workspace }}:/data -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf
             run: |
+              pwd
+              ls
               git config --global --add safe.directory /data/gitinfo-lua
               make -C gitinfo-lua build
       - name: Archive Documentation
