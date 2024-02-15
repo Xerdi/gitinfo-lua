@@ -28,7 +28,6 @@ jobs:
                  echo FILES:
                  ls
                  git config --global --add safe.directory /data/gitinfo-lua
-            #              git clone https://github.com/Xerdi/texmf-packaging.git texmf
                  make -C gitinfo-lua build
       - name: Archive Documentation
         uses: actions/upload-artifact@v3
