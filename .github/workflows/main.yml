@@ -15,8 +15,8 @@ jobs:
       - name: Check out texmf
         uses: actions/checkout@v4
         with:
-          repository: git@github.com:Xerdi/texmf-packaging.git
-          path: texmf
+          repository: https://github.com/Xerdi/texmf-packaging.git
+          path: ${{ github.workspace }}/texmf
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
