@@ -22,11 +22,13 @@ jobs:
         with:
             image: maclotsen/texlive:with-gf
             shell: bash
-            options: --rm -i -v ${{ github.workspace }}:/data -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf
+            options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/data
             run: |
-              pwd
+              echo PWD: $PWD
+              echo FILES:
               ls
               git config --global --add safe.directory /data/gitinfo-lua
+#              git clone https://github.com/Xerdi/texmf-packaging.git texmf
               make -C gitinfo-lua build
       - name: Archive Documentation
         uses: actions/upload-artifact@v3
