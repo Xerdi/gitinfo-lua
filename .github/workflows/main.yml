@@ -9,14 +9,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          path: gitinfo-lua
+          path: ${{ github.workspace }}/gitinfo-lua
           fetch-tags: true
           fetch-depth: 0
       - name: Check out texmf
         uses: actions/checkout@v4
         with:
           repository: Xerdi/texmf-packaging
-          path: texmf
+          path: ${{ github.workspace }}/texmf
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
