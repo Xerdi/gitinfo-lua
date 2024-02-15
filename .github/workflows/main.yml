@@ -20,16 +20,16 @@ jobs:
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
-            image: maclotsen/texlive:with-gf
-            shell: bash
-            options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/data
-            run: |
-              echo PWD: $PWD
-              echo FILES:
-              ls
-              git config --global --add safe.directory /data/gitinfo-lua
-#              git clone https://github.com/Xerdi/texmf-packaging.git texmf
-              make -C gitinfo-lua build
+          image: maclotsen/texlive:with-gf
+          shell: bash
+          options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/data
+          run: |
+                 echo PWD: $PWD
+                 echo FILES:
+                 ls
+                 git config --global --add safe.directory /data/gitinfo-lua
+            #              git clone https://github.com/Xerdi/texmf-packaging.git texmf
+                 make -C gitinfo-lua build
       - name: Archive Documentation
         uses: actions/upload-artifact@v3
         with:
