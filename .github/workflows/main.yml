@@ -22,7 +22,7 @@ jobs:
         with:
           image: maclotsen/texlive:with-gf
           shell: bash
-          options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/build
+          options: --rm -i --user=root -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/build
           run: |
                  git config --global --add safe.directory /build/gitinfo-lua
                  make -C gitinfo-lua build
