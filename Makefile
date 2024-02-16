@@ -1,5 +1,6 @@
 CONTRIBUTION = gitinfo-lua
-FILE = ${CONTRIBUTION}.tar.gz
+VERSION = $(shell git describe --tags --always)
+FILE = ${CONTRIBUTION}-${VERSION}.tar.gz
 MANUAL = doc/${CONTRIBUTION}
 COMPILER = lualatex --shell-escape --interaction=nonstopmode
 

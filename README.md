@@ -1,4 +1,5 @@
-# Git LaTeX
+# Gitinfo Lua
+![CTAN Version](https://img.shields.io/ctan/v/gitinfo-lua)
 
 A LaTeX package which provides macros integrated with LuaTeX and the commandline tool `git`.
 
@@ -17,8 +18,8 @@ makeindex -s gind.ist gitinfo-lua.idx
 lualatex -shell-escape gitinfo-lua.tex
 ```
 
-Read [gitinfo-lua.pdf](gitinfo-lua.pdf) for more information about this package.
+See the [releases section](https://github.com/Xerdi/gitinfo-lua/releases) for getting the latest manual.
 
 ## License
 This project is licensed under the LPPL version 1.3c and maintained by Erik Nijenhuis.
-See [LICENSE.pdf](LICENSE.pdf) for more information.
+See [LICENSE.txt](LICENSE.txt) for more information.
