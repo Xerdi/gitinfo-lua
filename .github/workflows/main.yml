@@ -17,6 +17,11 @@ jobs:
         with:
           repository: Xerdi/texmf-packaging
           path: ${{ github.workspace }}/texmf
+      - name: Debug Info
+        run: |
+          echo CURRENT WORKING DIRECTORY $PWD
+          echo FILES:
+          ls
       - name: Run the build process with Docker
         uses: addnab/docker-run-action@v3
         with:
