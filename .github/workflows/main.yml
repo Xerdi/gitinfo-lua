@@ -1,0 +1,33 @@
+name: Gitinfo Lua CI/CD
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          path: gitinfo-lua
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Check out texmf
+        uses: actions/checkout@v4
+        with:
+          repository: Xerdi/texmf-packaging
+          path: texmf
+      - name: Run the build process with Docker
+        uses: addnab/docker-run-action@v3
+        with:
+          image: maclotsen/texlive:with-gf
+          shell: bash
+          options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
+          run: |
+                 git config --global --add safe.directory /build/gitinfo-lua
+                 make -C gitinfo-lua build
+      - name: Archive Documentation
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: ${{ github.workspace }}/gitinfo-lua/doc
