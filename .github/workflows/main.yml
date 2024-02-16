@@ -27,7 +27,7 @@ jobs:
         with:
           image: maclotsen/texlive:with-gf
           shell: bash
-          options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/data
+          options: --rm -i -v ${{ github.workspace }}:/data
           run: |
                  echo PWD: $PWD
                  echo FILES:
