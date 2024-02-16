@@ -9,14 +9,14 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
         with:
-          path: ${{ github.workspace }}/gitinfo-lua
+          path: gitinfo-lua
           fetch-tags: true
           fetch-depth: 0
       - name: Check out texmf
         uses: actions/checkout@v4
         with:
           repository: Xerdi/texmf-packaging
-          path: ${{ github.workspace }}/texmf
+          path: texmf
       - name: Debug Info
         run: |
           echo CURRENT WORKING DIRECTORY $PWD
@@ -27,7 +27,7 @@ jobs:
         with:
           image: maclotsen/texlive:with-gf
           shell: bash
-          options: --rm -i -v ${{ github.workspace }}:/data
+          options: --rm -i -v ${{ github.workspace }}/texmf:/home/ltxuser/texmf -v ${{ github.workspace }}:/data
           run: |
                  echo PWD: $PWD
                  echo FILES:
