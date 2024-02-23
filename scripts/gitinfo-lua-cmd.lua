@@ -41,7 +41,7 @@ function api:exec(command, do_caching, target_dir)
     local cmd = self.executable .. ' ' .. command
     local cwd = target_dir or self.cwd
     if cwd then
-        cmd = 'cd ' .. cwd .. ';' .. cmd
+        cmd = 'cd ' .. cwd .. ' && ' .. cmd
     end
     if do_caching then
         local found, result = cache:seek(cmd)
