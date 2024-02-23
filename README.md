@@ -1,6 +1,6 @@
 # Gitinfo Lua
 ![CTAN Version](https://img.shields.io/ctan/v/gitinfo-lua)
-[![Build Status](https://github.com/Xerdi/gitinfo-lua/actions/workflows/main.yml/badge.svg)](https://github.com/Xerdi/gitinfo-lua/actions/workflows/main.yml)
+[![build](https://github.com/Xerdi/gitinfo-lua/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Xerdi/gitinfo-lua/actions/workflows/build.yml)
 
 A LaTeX package which provides macros integrated with LuaTeX and the commandline tool `git`.
 
