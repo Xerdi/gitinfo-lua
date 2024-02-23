@@ -45,7 +45,8 @@ local api = {
         ['{'] = '\\{',
         ['}'] = '\\}',
         ['~'] = '\\textasciitilde ',
-        ['%^'] = '\\textasciicircum '
+        ['%^'] = '\\textasciicircum ',
+        ['\n'] = ' '
     }
 }
 local mt = {
@@ -73,6 +74,7 @@ end
 
 function api:escape_str(value)
     local buf = string.gsub(value, '\\', '\\textbackslash ')
+    buf = string.gsub(buf, "\n%s*\n+", "\\par ")
     for search, replace in pairs(self.escape_chars) do
         buf = string.gsub(buf, search, replace)
     end

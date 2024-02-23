@@ -314,11 +314,13 @@ latexmk -pvc -lualatex -shell-escape main
 \end{description}
     \end{lstlisting}
     \noindent
-    \newcommand\commitline[1]{\item #1}
+    \newcommand\commitline[2]{\item #1
+
+    #2}
     \newcommand\formatversion[3]{%
         \item[#1] \gittag[(taggerdate)(taggerdate:short)(authordate:short)]{printdate}{#1}
         \begin{itemize}
-            \forgitcommit[s]{commitline}{#3}
+            \forgitcommit[s,b]{commitline}{#3}
         \end{itemize}%
     }%
     \setlength{\fboxsep}{16pt}%
