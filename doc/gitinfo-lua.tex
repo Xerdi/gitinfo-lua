@@ -103,6 +103,7 @@ latexmk -pvc -lualatex -shell-escape main
     Note that in both cases option \texttt{-shell-escape} is required.
     This is required for issuing \texttt{git} via the commandline.
 
+    When utilizing the continuous compilation option \texttt{-pvc} with \texttt{latexmk}, it's important to note that only committed changes will be detected, while tag changes, unfortunately, won't be recognized.
 
     \section{LaTeX Interface}
 
