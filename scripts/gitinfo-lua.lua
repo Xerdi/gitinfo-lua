@@ -1,5 +1,5 @@
 -- gitinfo-lua.lua
--- Copyright 2023 E. Nijenhuis
+-- Copyright 2024 E. Nijenhuis
 --
 -- This work may be distributed and/or modified under the
 -- conditions of the LaTeX Project Public License, either version 1.3c
@@ -14,7 +14,7 @@
 -- The Current Maintainer of this work is E. Nijenhuis.
 --
 -- This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
--- gitinfo-cmd.lua and gitinfo-lua.lua
+-- gitinfo-lua-cmd.lua, gitinfo-lua-recorder.lua and gitinfo-lua.lua
 
 if not modules then
     modules = {}
@@ -79,58 +79,6 @@ function api:escape_str(value)
         buf = string.gsub(buf, search, replace)
     end
     return buf
-end
-
--- experimental
-function api:get_tok()
-    if self.cur_tok == nil then
-        self.cur_tok = token.get_next()
-    end
-    return self.cur_tok
-end
-
--- experimental
-function api:parse_opts()
-    local tok = self:get_tok()
-    if tok.cmdname == 'other_char' then
-        --token.put_next(tok)
-        local opts = token.scan_word()
-        self.cur_tok = nil
-        -- todo: parse []
-        return opts
-    end
-end
-
--- experimental
-function api:parse_arguments(argc)
-    local result_list = {}
-    for _ = 1, argc do
-        local tok = self:get_tok()
-        if tok.cmdname == 'left_brace' then
-            token.put_next(tok)
-            table.insert(result_list, token.scan_argument())
-            self.cur_tok = nil
-        else
-            tex.error("Expected left brace")
-            return
-        end
-    end
-    return table.unpack(result_list)
-end
-
--- experimental
-function api:parse_macro()
-    --tex.print('\\noexpand')
-    local tok = self:get_tok()
-    if (tok.cmdname == 'call') or tok.cmdname == 'long_call' then
-        self.cur_tok = nil
-        return tok
-    else
-        tex.error("Expected Macro")
-        for i = 1, 5 do
-            local _tok = token.get_next()
-        end
-    end
 end
 
 function api:dir(path)

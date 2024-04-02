@@ -1,5 +1,5 @@
 -- gitinfo-lua-cmd.lua
--- Copyright 2023 E. Nijenhuis
+-- Copyright 2024 E. Nijenhuis
 --
 -- This work may be distributed and/or modified under the
 -- conditions of the LaTeX Project Public License, either version 1.3c
@@ -14,14 +14,15 @@
 -- The Current Maintainer of this work is E. Nijenhuis.
 --
 -- This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
--- gitinfo-cmd.lua and gitinfo-lua.lua
+-- gitinfo-lua-cmd.lua, gitinfo-lua-recorder.lua and gitinfo-lua.lua
 
 local api = {
     cwd = nil,
     executable = 'git',
     default_sort = '',
     attribute_separator = '\\pop',
-    record_separator = '\\end'
+    record_separator = '\\end',
+    recorder = require('gitinfo-lua-recorder')
 }
 local cache = {}
 function cache:seek(_key)
@@ -40,6 +41,7 @@ end
 function api:exec(command, do_caching, target_dir)
     local cmd = self.executable .. ' ' .. command
     local cwd = target_dir or self.cwd
+    api.recorder.record_head(cwd)
     if cwd then
         cmd = 'cd ' .. cwd .. ' && ' .. cmd
     end
