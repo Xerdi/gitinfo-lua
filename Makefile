@@ -42,8 +42,8 @@ ${MANUAL}.pdf: scenario ${MANUAL}.idx ${MANUAL}.tex $(wildcard tex/*.sty) $(wild
 	@echo "Creating documentation PDF"
 	cd doc && $(COMPILER) ${CONTRIBUTION}
 
-#	while grep 'Rerun to get ' doc/${CONTRIBUTION}.log ; do cd doc && $(COMPILER) ${CONTRIBUTION} ; done
-
 ${FILE}: ${MANUAL}.pdf clean
 	@echo "Creating package tarball"
-	tar --transform 's,^\.,gitinfo-lua,' -czvf ${FILE} ./README.md ./doc ./scripts ./tex
+	tar --transform 's,^\.,gitinfo-lua,' \
+		--exclude=doc/.latexmkrc \
+		-czvf ${FILE} ./README.md ./doc ./scripts ./tex
