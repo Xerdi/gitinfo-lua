@@ -26,6 +26,7 @@
 
 \newif\ifgit@multipleauthors
 \newif\ifgit@setmacros
+\newif\ifgit@toroot
 \pgfkeys{/gitinfo-lua/.is family,
     /gitinfo-lua,
     author sort/.default=false,
@@ -39,7 +40,9 @@
     authors/.style={multiple authors=true},
     set title page macros/.is if=git@setmacros,
     set title page macros=false,
-    titlepage/.style={set title page macros=true}
+    titlepage/.style={set title page macros=true},
+    rootdir/.is if=git@toroot,
+    rootdir=false
 }
 
 \ProcessPgfPackageOptions*
@@ -80,6 +83,10 @@
     \directlua{git:cs_for_tag('#2', '#1')}%
 }
 \newcommand{\forgittagseq}[1]{\directlua{git:cs_for_tag_sequence('#1')}}
+
+\ifgit@toroot
+    \directlua{git:dir_to_root()}
+\fi
 
 \ifgit@setmacros
     \ifgit@multipleauthors

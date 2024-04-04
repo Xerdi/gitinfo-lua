@@ -100,8 +100,9 @@ lualatex -shell-escape main
 # Generate and keep watching with LaTeXMK
 latexmk -pvc -lualatex -shell-escape main
     \end{lstlisting}
-    Note that in both cases option \texttt{-shell-escape} is required.
+    Note that in both cases option \texttt{--shell-escape} is required.
     This is required for issuing \texttt{git} via the commandline.
+    If using \texttt{--shell-restricted} mode, make sure to add \texttt{git} to the CSV variable \texttt{shell\_escape\_commands} in i.e.\ \texttt{texmf.cnf}.
 
     When utilizing the continuous compilation option \texttt{-pvc} with \texttt{latexmk}, it's important to note that only committed changes will be detected, while tag changes, unfortunately, won't be recognized.
 
@@ -114,16 +115,21 @@ latexmk -pvc -lualatex -shell-escape main
     \texttt{\textbraceleft gitinfo-lua\textbraceright}\index[pkgopts]{gitinfo-lua(.sty)}
     This package provides some options for default formatting purposes.
     The author sorting is one of them.
-    If the options contain \meta{contrib} the authors will be sorted based on their contributions, otherwise the authors will be sorted alphabetically, which is the default option \meta{alpha}.
-    Another option is the \meta{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
-    By default, it sets the local git author, equivalent to option \meta{author}.
-    Pass option \meta{authors} to set all git authors of the project instead.
+    If the options contain \texttt{contrib} the authors will be sorted based on their contributions; otherwise, the authors will be sorted alphabetically, which is the default option \texttt{alpha}.
+    Another option is the \texttt{titlepage} option, which sets the \cmd{\author} and \cmd{\date} macros accordingly.
+    By default, it sets the local git author, equivalent to option \texttt{author}.
+    Pass the option \texttt{authors} to set all git authors of the project based on commit history instead.
+
+    Another option, more concerning directory management, \texttt{rootdir}, sets the current working directory to the root directory of the current project for all \texttt{git} commands that are executed, similar to what \cmd{\gitdirectory} does.
+    If you're using recording of files, this option comes in handy when the main file is in a subdirectory of the project.
+    Otherwise, if the root directory isn't set appropriately, you'll receive the warning `\texttt{Warning: couldn't read HEAD from git project directory}'.
 
     \subsection{Basic macros}\label{sub:tex-basic}
-    By default the main file's directory is used as git project directory.
+    By default, the main file's directory is used as git project directory.
     This directory can be manipulated with \DescribeMacro{\gitdirectory}\cmd{\gitdirectory}\marg{path}.
-    This is only tested with relative paths on Linux.
-    \DescribeMacro{\gitunsetdirectory} To undo this operation and switch back to the main file's directory use \cmd{\gitunsetdirectory}.\\
+    The foremost difference between using the \texttt{rootdir} option and the \cmd{gitdirectory} macro, is that the macro can specify a git directory which is part of another project.
+    The main reason for this macro to exist is its usage in the project example in section~\ref{sec:project}.
+    \DescribeMacro{\gitunsetdirectory} To undo an operation done with \cmd{\gitdirectory} and switch back to the main file's directory, use \cmd{\gitunsetdirectory}.\\
 
     \noindent
     \DescribeMacro{\gitversion} The current version can be display by using \cmd{\gitversion} and is equivalent to \texttt{git describe --tags --always}, working for both lightweight and annotated tags.

@@ -30,7 +30,7 @@ local api = {
 function api.record_head(git_directory)
     local head_path = '.git/HEAD'
     if git_directory then
-        head_path = git_directory .. head_path
+        head_path = git_directory .. '/' .. head_path
     end
     if not api.record_list[head_path] then
         api.record_list[head_path] = true
@@ -52,7 +52,7 @@ function api.record_head(git_directory)
             end
             ref_path = '.git/' .. ref_path
             if git_directory then
-                ref_path = git_directory .. ref_path
+                ref_path = git_directory .. '/' .. ref_path
             end
             if kpse.in_name_ok(ref_path) then
                 kpse.record_input_file(ref_path)

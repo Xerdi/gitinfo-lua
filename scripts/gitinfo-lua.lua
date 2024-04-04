@@ -85,6 +85,15 @@ function api:dir(path)
     self.cmd.cwd = path
 end
 
+function api:dir_to_root()
+    local toplevel, err = self.cmd:exec('rev-parse --show-toplevel', false, nil, true)
+    if toplevel then
+        self.cmd.cwd = self.cmd.trim(toplevel)
+    else
+        tex.error(err)
+    end
+end
+
 function api:version()
     return self.trim(self.cmd:exec('describe --tags --always', true))
 end

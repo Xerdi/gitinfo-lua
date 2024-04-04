@@ -38,12 +38,15 @@ function api.trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-function api:exec(command, do_caching, target_dir)
-    local cmd = self.executable .. ' ' .. command
+function api:exec(command, do_caching, target_dir, no_recording)
     local cwd = target_dir or self.cwd
-    api.recorder.record_head(cwd)
+    local cmd = self.executable
     if cwd then
-        cmd = 'cd ' .. cwd .. ' && ' .. cmd
+        cmd = cmd .. ' -C ' .. cwd
+    end
+    cmd = cmd .. ' ' .. command
+    if not no_recording then
+        api.recorder.record_head(cwd)
     end
     if do_caching then
         local found, result = cache:seek(cmd)
@@ -53,7 +56,7 @@ function api:exec(command, do_caching, target_dir)
     end
     local f = io.popen(cmd)
     if f == nil then
-        return nil, "Couldn't execute git command.\n\tIs option '-shell-escape' turned on?"
+        return nil, "Couldn't execute git command.\n\tIs option '--shell-escape' turned on?"
     end
     local s = f:read('*a')
     if f:close() then
