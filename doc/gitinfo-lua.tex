@@ -213,9 +213,13 @@ latexmk -pvc -lualatex -shell-escape main
     Consult \texttt{man git-log} for possible format variables and omit the \% for every variable.\\
 
     \noindent
-    \DescribeMacro{\forgitcommit}\oarg{format}\marg{csname}\marg{rev\_spec}\\
+    \DescribeMacro{\forgitcommit}\oarg{format}\marg{csname}\marg{rev\_spec, files=\{...\}, flags=\{...\}, cwd=...}\\
     For displaying multiple commits the~\cmd{\forgitcommit} is used, which has the same arguments as \cmd{\gitcommit}, but only this time the \texttt{csname} is executed for every commit.
-    The last argument \texttt{rev\_spec} this time, however, can have no argument or a sequence.
+    The last argument, which originally only took a \texttt{rev\_spec}, now also supports some additional `named' arguments.
+    The argument \meta{files} takes a list of file names relative from the root of the git project.
+    When \meta{files} is given, all commits will be filtered out accordingly.
+    Currently, for \meta{flags}, only \texttt{merges} and \texttt{no-merges} are supported, which includes or excludes merge commits.
+    The \meta{cwd} option is like \cmd{\gitdirectory}, but only for this call.
 
     \noindent\setlength\xample{4.5cm}\setlength\xamplesep{0pt}
     \begin{minipage}[t]{\linewidth-\xample-\xamplesep}

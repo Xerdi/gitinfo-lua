@@ -214,7 +214,7 @@ local parse_commit_opts = luakeys.define({
     flags = {
         sub_keys = {
             merges = { data_type='boolean', exclusive_group='merges' },
-            ['no-merges'] = { name = 'no-merges', data_type='boolean', exclusive_group='merges' }
+            ['no-merges'] = { data_type='boolean', exclusive_group='merges' }
         }
     }
 })
