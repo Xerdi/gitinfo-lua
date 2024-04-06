@@ -2,8 +2,8 @@ CONTRIBUTION = gitinfo-lua
 VERSION = $(shell git describe --tags --always)
 FILE = ${CONTRIBUTION}-${VERSION}.tar.gz
 MANUAL = doc/${CONTRIBUTION}
-CNF_LINE = -cnf-line TEXMFHOME={${CURDIR},$(shell kpsewhich --var-value TEXMFHOME)}
-COMPILER = lualatex --shell-escape --interaction=nonstopmode $(CNF_LINE)
+CNF_LINE = -cnf-line TEXMFHOME={${CURDIR},$(shell kpsewhich --var-value TEXMFHOME)} -cnf-line shell_escape_commands=git
+COMPILER = lualatex --shell-restricted --interaction=nonstopmode $(CNF_LINE)
 RM = rm
 ifeq ($(OS),Windows_NT)
 RM = del
