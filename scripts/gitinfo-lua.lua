@@ -208,7 +208,7 @@ function api:cs_last_commit(csname, format)
 end
 
 local parse_commit_opts = luakeys.define({
-    rev_spec = { pick = 'string', default=api:version()..'...HEAD' },
+    rev_spec = { data_type = 'string', pick = 'string' },
     files = { data_type = 'list' },
     cwd = { data_type = 'string' },
     flags = {
@@ -233,6 +233,16 @@ function api:cs_for_commit(csname, args, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
         local opts = parse_commit_opts(args)
+        -- Something is going wrong with the parsing of rev_spec with pick, which ends up to be missing
+        -- This is a walkaround to ensure the old API would still work
+        if type(opts.rev_spec) ~= 'string' then
+            local i = string.find(args, ',')
+            if i then
+        	    opts.rev_spec = string.sub(args, 1, i-1)
+        	else
+        	    opts.rev_spec = args
+        	end
+        end
         local log, err = self.cmd:log(format, opts.rev_spec, parse_flags(opts.flags), opts.cwd, opts['files'])
         if log then
             for _, commit in ipairs(log) do
