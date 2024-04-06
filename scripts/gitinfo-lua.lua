@@ -56,6 +56,8 @@ local mt = {
 local gitinfo = {}
 setmetatable(gitinfo, mt)
 
+local luakeys = require('luakeys')()
+
 function api.trim(s)
     return s and (s:gsub("^%s*(.-)%s*$", "%1")) or 'nil'
 end
@@ -205,10 +207,33 @@ function api:cs_last_commit(csname, format)
     return self:cs_commit(csname, '-1', format)
 end
 
-function api:cs_for_commit(csname, rev_spec, format)
+local parse_commit_opts = luakeys.define({
+    rev_spec = { pick = 'string', default=api:version()..'...HEAD' },
+    files = { data_type = 'list' },
+    cwd = { data_type = 'string' },
+    flags = {
+        sub_keys = {
+            merges = { data_type='boolean', exclusive_group='merges' },
+            ['no-merges'] = { name = 'no-merges', data_type='boolean', exclusive_group='merges' }
+        }
+    }
+})
+local function parse_flags(flags_table)
+    local t = {}
+    if flags_table then
+        for k,v in pairs(flags_table) do
+            if v then
+                table.insert(t, k)
+            end
+        end
+    end
+    return t
+end
+function api:cs_for_commit(csname, args, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
-        local log, err = self.cmd:log(format, rev_spec)
+        local opts = parse_commit_opts(args)
+        local log, err = self.cmd:log(format, opts.rev_spec, parse_flags(opts.flags), opts.cwd, opts['files'])
         if log then
             for _, commit in ipairs(log) do
                 tex.print(tok)
