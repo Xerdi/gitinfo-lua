@@ -45,20 +45,24 @@ function api.record_head(git_directory)
             local head_info = head_file:read('*a')
             head_file:close()
             local i, j = string.find(head_info, '^ref: .+\n$')
-            local ref_path = string.sub(head_info, i + 5, j-1)
-            if not ref_path then
-                texio.write_nl('Warning: couldn\'t find ref of HEAD')
-                return
-            end
-            ref_path = '.git/' .. ref_path
-            if git_directory then
-                ref_path = git_directory .. '/' .. ref_path
-            end
-            if kpse.in_name_ok(ref_path) then
-                kpse.record_input_file(ref_path)
-                texio.write_nl('Info: recording input file ' .. ref_path)
+            if i and j then
+                local ref_path = string.sub(head_info, i + 5, j-1)
+                if not ref_path then
+                    texio.write_nl('Warning: couldn\'t find ref of HEAD')
+                    return
+                end
+                ref_path = '.git/' .. ref_path
+                if git_directory then
+                    ref_path = git_directory .. '/' .. ref_path
+                end
+                if kpse.in_name_ok(ref_path) then
+                    kpse.record_input_file(ref_path)
+                    texio.write_nl('Info: recording input file ' .. ref_path)
+                else
+                    texio.write_nl('Warning: couldn\'t read ref file: ' .. ref_path)
+                end
             else
-                texio.write_nl('Warning: couldn\'t read ref file: ' .. ref_path)
+                texio.write_nl('Warning: didn\'t find any ref in .git/HEAD')
             end
         else
             texio.write_nl('Couldn\'t open input file ' .. head_path)
