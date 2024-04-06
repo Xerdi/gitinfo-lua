@@ -38,7 +38,7 @@ function api.trim(s)
     return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-function api:exec(command, do_caching, target_dir, no_recording)
+function api:exec(command, do_caching, target_dir, no_recording, path_spec)
     local cwd = target_dir or self.cwd
     local cmd = self.executable
     if cwd then
@@ -47,6 +47,16 @@ function api:exec(command, do_caching, target_dir, no_recording)
     cmd = cmd .. ' ' .. command
     if not no_recording then
         api.recorder.record_head(cwd)
+    end
+    if path_spec then
+    	if type(path_spec) == 'table' then
+    	    cmd = cmd .. ' --'
+    	    for _,path in ipairs(path_spec) do
+    	        cmd = cmd .. ' ' .. path
+    	    end
+        elseif type(path_spec) == 'string' then
+            cmd = cmd .. ' -- ' .. path_spec
+    	end
     end
     if do_caching then
         local found, result = cache:seek(cmd)
@@ -145,7 +155,7 @@ function api:parse_response(buffer)
     return results
 end
 
-function api:log(format_spec, revision, options, target_dir)
+function api:log(format_spec, revision, options, target_dir, path_spec)
     local format, err = self:parse_format_spec(format_spec)
     if err then
         return nil, err
@@ -158,7 +168,7 @@ function api:log(format_spec, revision, options, target_dir)
     if revision and revision ~= '' then
         cmd = cmd .. ' ' .. revision
     end
-    local response, err = self:exec(cmd, true, target_dir)
+    local response, err = self:exec(cmd, true, target_dir, false, path_spec)
     if not response then
         return nil, err
     end
