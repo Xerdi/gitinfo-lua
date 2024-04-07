@@ -59,5 +59,4 @@ ${TDS_ARCHIVE}: ${MANUAL}.pdf clean
 	    --transform 's,^README,doc/lualatex/gitinfo-lua/README,' \
 		--transform 's,^scripts,scripts/gitinfo-lua,' \
 		--transform 's,^tex,tex/lualatex/gitinfo-lua,' \
-		--exclude=doc/.latexmkrc \
 		-czvf ${TDS_ARCHIVE} README.md doc scripts tex
