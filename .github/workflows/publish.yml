@@ -41,7 +41,7 @@ jobs:
           body: |
             Release for version ${{ github.ref_name }}
       - name: 'Upload Release Asset: CTAN Upload'
-        id: upload_release_asset_tar
+        id: upload_release_asset_ctan_upload
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +51,7 @@ jobs:
           asset_name: gitinfo-lua-${{ github.ref_name }}.tar.gz
           asset_content_type: application/gzip
       - name: 'Upload Release Asset: TDS Archive'
-        id: upload_release_asset_tar
+        id: upload_release_asset_tds_archive
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
