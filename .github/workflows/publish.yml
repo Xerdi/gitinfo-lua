@@ -28,7 +28,7 @@ jobs:
           options: --rm -i -v ${{ github.workspace }}/texmf:/root/texmf -v ${{ github.workspace }}:/build
           run: |
             git config --global --add safe.directory /build/gitinfo-lua
-            make -C gitinfo-lua package
+            make -C gitinfo-lua all
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -40,7 +40,7 @@ jobs:
           draft: true
           body: |
             Release for version ${{ github.ref_name }}
-      - name: 'Upload Release Asset: Tar'
+      - name: 'Upload Release Asset: CTAN Upload'
         id: upload_release_asset_tar
         uses: actions/upload-release-asset@v1
         env:
@@ -49,6 +49,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/gitinfo-lua/gitinfo-lua-${{ github.ref_name }}.tar.gz
           asset_name: gitinfo-lua-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/gzip
+      - name: 'Upload Release Asset: TDS Archive'
+        id: upload_release_asset_tar
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/gitinfo-lua/gitinfo-lua-${{ github.ref_name }}.tds.tar.gz
+          asset_name: gitinfo-lua-${{ github.ref_name }}.tds.tar.gz
           asset_content_type: application/gzip
       - name: 'Upload Release Asset: Manual'
         id: upload_release_asset_manual
