@@ -16,9 +16,9 @@ The documentation can be built using `make build clean` or manually using `luala
 # Using the original TEXMFHOME and the project directory
 CNF_LINE="TEXMFHOME={$(pwd),$(kpsewhich --var-value TEXMFHOME)}"
 cd doc
-lualatex --lua=gitinfo-lua-init.lua -bibtex -cnf-line $CNF_LINE gitinfo-lua
+lualatex --lua=gitinfo-lua-init.lua --cnf-line $CNF_LINE gitinfo-lua
 makeindex -s gind.ist gitinfo-lua.idx
-lualatex --lua=gitinfo-lua-init.lua -bibtex -cnf-line $CNF_LINE gitinfo-lua
+lualatex --lua=gitinfo-lua-init.lua --cnf-line $CNF_LINE gitinfo-lua
 ```
 To do the same as the Lua initialization script, commandline option `--shell-restricted` should be passed and `git` should be added to `shell_escape_commands` in your `texmf.cnf`.
 The `texmf.cnf` file to edit can be found with `kpsewhich texmf.cnf`.
