@@ -178,7 +178,7 @@ function api:cs_for_authors(csname, conjunction, sort_by_contrib)
             tex.error(err)
         end
     else
-        tex.error('ERROR: \\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
@@ -199,7 +199,7 @@ function api:cs_commit(csname, rev, format)
             tex.error('ERROR: ' .. (err or 'nil'))
         end
     else
-        tex.error('ERROR: \\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
@@ -208,7 +208,7 @@ function api:cs_last_commit(csname, format)
 end
 
 local parse_commit_opts = luakeys.define({
-    rev_spec = { data_type = 'string', pick = 'string' },
+    rev_spec = { pick = 'string' },
     files = { data_type = 'list' },
     cwd = { data_type = 'string' },
     flags = {
@@ -233,8 +233,9 @@ function api:cs_for_commit(csname, args, format)
     if token.is_defined(csname) then
         local tok = token.create(csname)
         local opts = parse_commit_opts(args)
-        -- Something is going wrong with the parsing of rev_spec with pick, which ends up to be missing
-        -- This is a walkaround to ensure the old API would still work
+        -- Something is going wrong with the parsing of rev_spec with pick, which ends up to be missing.
+        -- This is a workaround to ensure the old API would still work.
+        -- This will be fixed after luakeys version >0.13.0
         if type(opts.rev_spec) ~= 'string' then
             local i = string.find(args, ',')
             if i then
@@ -242,6 +243,8 @@ function api:cs_for_commit(csname, args, format)
         	else
         	    opts.rev_spec = args
         	end
+        else
+            opts.rev_spec = string.gsub(opts.rev_spec, '[\'"]', '')
         end
         local log, err = self.cmd:log(format, opts.rev_spec, parse_flags(opts.flags), opts.cwd, opts['files'])
         if log then
@@ -252,10 +255,10 @@ function api:cs_for_commit(csname, args, format)
                 end
             end
         else
-            tex.error('ERROR:\\' .. err)
+            tex.error('ERROR: ' .. err)
         end
     else
-        tex.error('ERROR: \\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
@@ -293,7 +296,7 @@ function api:cs_tag(csname, format_spec, tag, target_dir)
             end
         end
     else
-        tex.error('ERROR:\\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
@@ -309,10 +312,10 @@ function api:cs_for_tag(csname, format_spec, target_dir)
                 end
             end
         else
-            tex.error('ERROR:\\' .. err)
+            tex.error('ERROR: ' .. err)
         end
     else
-        tex.error('ERROR:\\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
@@ -330,10 +333,10 @@ function api:cs_for_tag_sequence(csname, target_dir)
                 end
             end
         else
-            tex.error('ERROR:\\' .. (err or 'Unknown error'))
+            tex.error('ERROR: ' .. (err or 'Unknown error'))
         end
     else
-        tex.error('ERROR:\\' .. csname .. ' not defined')
+        tex.error('ERROR: ' .. csname .. ' not defined')
     end
 end
 
