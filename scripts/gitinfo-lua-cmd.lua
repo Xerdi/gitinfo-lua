@@ -75,7 +75,7 @@ function api:exec(command, do_caching, target_dir, no_recording, path_spec)
         end
         return s
     else
-        return nil, 'Error executing git command'
+        return nil, 'Error executing git command\n\t"' .. cmd .. '"'
     end
 end
 
