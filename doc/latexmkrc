@@ -1,2 +1,5 @@
+# Adds the gind.ist style, which is required
+$makeindex = "makeindex %O -o %D -s gind.ist %S";
 
+# Cleanup extra auxiliary files
 push @generated_exts, "glo";
