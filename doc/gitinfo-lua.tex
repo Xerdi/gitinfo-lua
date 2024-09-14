@@ -157,6 +157,9 @@ $lualatex = "lualatex --lua=gitinfo-lua-init.lua %O %S";
     When the version is dirty it will be post fixed with \texttt{-<commit count>-<short ref>}.
     For example, when this paragraph was written, the version was displaying 0.0.1-14-gcc2bc30.\\
 
+    \DescribeMacro{\ifgitdirty} To test whether there are any pending changes in the local Git repository, use the \cmd{\ifgitdirty}\marg{true code}\marg{false code} macro.
+    For this macro to work properly, be sure to add a \texttt{.gitignore}\footnote{A proper example of a \texttt{.gitignore} file for \LaTeX: \url{https://raw.githubusercontent.com/github/gitignore/main/TeX.gitignore}} file and include all \TeX\ based generated files.\\
+
     The \DescribeMacro{\gitdate}\cmd{\gitdate} macro gets the most recent date from the git log.
     Meaning, the last `short date' variant is picked from the last commit.
     This short date is formatted ISO based and is already suitable for use in packages like \texttt{isodate} for more advanced date formatting.\\
@@ -201,7 +204,6 @@ $lualatex = "lualatex --lua=gitinfo-lua-init.lua %O %S";
     For this section the git project of this document is used due to the fact that there are references to revisions.
     The test project's revisions change for every user, since they get recreated every time \texttt{test-scenario.sh} is executed (see section~\ref{sec:project}).\\
 
-    \clearpage
     \noindent
     \DescribeMacro{\gitcommit}\oarg{format}\marg{csname}\marg{revision}\\
     For displaying commit data \cmd{\gitcommit} can be used.
