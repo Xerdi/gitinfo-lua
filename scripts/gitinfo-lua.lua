@@ -109,10 +109,23 @@ function api:write_version()
     end
 end
 
+function api:is_dirty()
+    local files_changed, _ = self.cmd:exec('status --porcelain=1', true)
+    return files_changed and #files_changed > 0
+end
+
+function api:write_is_dirty()
+    if self:is_dirty() then
+        tex.write('1')
+    else
+        tex.write('0')
+    end
+end
+
 -- todo: prevent output to stderr
 -- todo: add write variant
 -- experimental
-function api:is_dirty()
+function api:is_tag()
     local ok, _ = self.cmd:exec('describe --tags --exact-match')
     return ok == nil
 end
