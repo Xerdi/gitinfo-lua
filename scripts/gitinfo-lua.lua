@@ -16,6 +16,9 @@
 -- This work consists of the files gitinfo-lua.sty gitinfo-lua.pdf
 -- gitinfo-lua-cmd.lua, gitinfo-lua-recorder.lua and gitinfo-lua.lua
 
+local texconfig = texconfig or require('texconfig')
+local kpse = kpse or require('kpse')
+
 if not modules then
     modules = {}
 end
@@ -32,6 +35,11 @@ local module = {
 }
 
 modules[module.name] = module.info
+
+-- Probably being called directly with i.e. texlua
+if not texconfig.kpse_init then
+    kpse.set_program_name('lualatex')
+end
 
 local api = {
     cur_tok = nil,
@@ -56,7 +64,7 @@ local mt = {
 local gitinfo = {}
 setmetatable(gitinfo, mt)
 
-local luakeys = require('luakeys')()
+local luakeys = luakeys or require('luakeys')()
 
 function api.trim(s)
     return s and (s:gsub("^%s*(.-)%s*$", "%1")) or 'nil'
@@ -96,8 +104,8 @@ function api:dir_to_root()
     end
 end
 
-function api:version()
-    return self.trim(self.cmd:exec('describe --tags --always', true))
+function api:version(no_recording)
+    return self.trim(self.cmd:exec('describe --tags --always', true, nil, no_recording))
 end
 
 function api:write_version()
@@ -117,8 +125,8 @@ function api:is_dirty()
     return ok == nil
 end
 
-function api:local_author()
-    return self.trim(self.cmd:exec('config user.name', true))
+function api:local_author(no_recording)
+    return self.trim(self.cmd:exec('config user.name', true, nil, no_recording))
 end
 
 function api:write_local_author()
@@ -130,8 +138,8 @@ function api:write_local_author()
     end
 end
 
-function api:local_email()
-    return self.trim(self.cmd:exec('config user.email', true))
+function api:local_email(no_recording)
+    return self.trim(self.cmd:exec('config user.email', true, nil, no_recording))
 end
 
 function api:write_local_email()
@@ -338,6 +346,28 @@ function api:cs_for_tag_sequence(csname, target_dir)
     else
         tex.error('ERROR: ' .. csname .. ' not defined')
     end
+end
+
+-- Handle commandline arguments for texlua
+if not texconfig.kpse_init then
+    local result = {}
+    local is_opt = function(name, opt)
+        return string.find(opt, '%-%-?' .. name)
+    end
+
+    for _, a in ipairs(arg) do
+        if is_opt('version', a) then
+            table.insert(result, gitinfo:version(true))
+        end
+        if is_opt('author', a) then
+            table.insert(result, gitinfo:local_author(true))
+        end
+        if is_opt('email', a) then
+            table.insert(result, gitinfo:local_email(true))
+        end
+    end
+
+    print(table.concat(result, ' '))
 end
 
 return gitinfo
