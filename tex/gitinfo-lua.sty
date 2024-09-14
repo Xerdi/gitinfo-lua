@@ -53,6 +53,15 @@
 \newcommand*\gitdate{\directlua{git:cs_last_commit('git@single@arg', 'cs')}}
 \newcommand*\gitdirectory[1]{\directlua{git:dir('#1')}}
 \newcommand*\gitunsetdirectory{\directlua{git:dir(nil)}}
+\newcommand*\ifgitdirty[2]{%
+    \def\@dirtytrue{1}%
+    \edef\@dirty{\directlua{git:write_is_dirty()}}%
+    \ifx\@dirty\@dirtytrue
+        #1%
+    \else
+        #2%
+    \fi
+}
 
 \newcommand\git@format@author[2]{%
     #1
